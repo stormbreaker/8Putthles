@@ -1,8 +1,12 @@
 ;Load in Dr. Weiss's search code
 (load 'search.lsp)
 
-(defun 8puzzle  puzzleFile  &optional puzzleSize
-    (let ((puzzleList ((1 3 4)(8 6 2)(7 0 5))))
+(defun 8puzzle  
+    (
+     puzzleFile  
+     &optional puzzleSize
+    )
+    (let ((puzzleList ((1 3 4)(8 6 2)(7 0 5)))) ;set puzzel list to easy puzzel as default
          ;check if size is Valid
          ;read in puzzleFile into puzzle list
          ;check if solvable <- he does give us a solvable function
@@ -29,7 +33,12 @@
     )
 )
 
-(defun search   puzzleList  algorithm   Heuristic 
+(defun search   
+    (
+     puzzleList  
+     algorithm   
+     Heuristic
+    )
     (let    (answerList)
             ;(if Heuristic /= null)
                 (algorithm  puzzleList  Heuristic);return answerList
@@ -41,7 +50,10 @@
     )
 )
 
-(defun  BFS puzzleList
+(defun  BFS 
+    (
+     puzzleList
+    )
     (let    (answerList)
             ;bfs search
             ;return answerList
@@ -92,3 +104,22 @@
 
 
 ;Will also need three different heuristic functions
+
+
+;Functions needed for weiss's search algorithms
+(defun generate-successors (state)
+    
+    
+)
+    
+
+(defun goal-state (state)
+    (if (null (equal (con state) '(1 2 3))) (return-from goal-state nil))
+    (if (null (equal (cdr state) '(4 0 5))) (return-from goal-state nil))
+    (if (null (equal (cdr state) '(6 7 8))) (return-from goal-state nil))
+    t
+)
+    
+    
+    
+)

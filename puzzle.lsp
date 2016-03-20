@@ -1,39 +1,40 @@
 ;Load in Dr. Weiss's search code
 (load 'search.lsp)
+(declaim (ftype (function () t) customSearch))
 
 (defun 8puzzle  
     (
      puzzleFile  
      &optional puzzleSize
     )
-    (let ((puzzleList ((1 3 4)(8 6 2)(7 0 5)))) ;set puzzel list to easy puzzel as default
+    (let ((defvar puzzleList '((1 3 4)(8 6 2)(7 0 5)))) ;set puzzel list to easy puzzel as default
          ;check if size is Valid
          ;read in puzzleFile into puzzle list
          ;check if solvable <- he does give us a solvable function
          
          ;BreathFirstSearch
-         (search    puzzleList  BFS Null );return OutputList
+         (customSearch    puzzleList  BFS Null );return OutputList
          (PrintScreen OutputList)
          
          ;DepthFirstIteratedDepeningSearch
-         (search    puzzleList  DFID    Null );return OutputList
+         (customSearch    puzzleList  DFID    Null );return OutputList
          (printScreen OutputList)
          
          ;A* admissible #1
-         (search    puzzleList  bestFirst   admissibleHeuristic1 );return OutputList
+         (customSearch    puzzleList  bestFirst   admissibleHeuristic1 );return OutputList
          (printScreen OutputList)
          
          ;A* admissible #2
-         (search    puzzleList  bestFirst   admissibleHeuristic2 );return OutputList
+         (customSearch    puzzleList  bestFirst   admissibleHeuristic2 );return OutputList
          (printScreen OutputList)
          
          ;A* inadmissible
-         (search    puzzleList  bestFirst   inAdmissibleHeuristic1 );return OutputList
+         (customSearch    puzzleList  bestFirst   inAdmissibleHeuristic1 );return OutputList
          (printScreen OutputList)
     )
 )
 
-(defun search   
+(defun customSearch   
     (
      puzzleList  
      algorithm   
@@ -50,24 +51,7 @@
     )
 )
 
-(defun  BFS 
-    (
-     puzzleList
-    )
-    (let    (answerList)
-            ;bfs search
-            ;return answerList
-    )
-)
-
-(defun  DFID puzzleList
-    (let    (answerList)
-            ;dfid search
-            ;return answerList
-    )
-)
-
-(defun bestFirst    puzzleList  heuristic
+(defun bestFirst    'puzzleList  heuristic
     (let    (answerList)
 
             ; sudo code for a* from Weiss's website
@@ -96,7 +80,7 @@
     )
 )
 
-(defun printScreen  outputList
+(defun printScreen  'outputList
     (let    ()
             ;actually print to screen
     )
@@ -114,12 +98,8 @@
     
 
 (defun goal-state (state)
-    (if (null (equal (con state) '(1 2 3))) (return-from goal-state nil))
-    (if (null (equal (cdr state) '(4 0 5))) (return-from goal-state nil))
-    (if (null (equal (cdr state) '(6 7 8))) (return-from goal-state nil))
+    (if (null (equal (car state) '(1 2 3))) (return-from goal-state nil))
+    (if (null (equal (cadr state) '(4 0 5))) (return-from goal-state nil))
+    (if (null (equal (caddr state) '(6 7 8))) (return-from goal-state nil))
     t
-)
-    
-    
-    
 )

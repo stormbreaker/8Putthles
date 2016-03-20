@@ -1,5 +1,8 @@
+;Load in Dr. Weiss's search code
+(load 'search.lsp)
+
 (defun 8puzzle  puzzleFile  &optional puzzleSize
-    (let (puzzleList)
+    (let ((puzzleList ((1 3 4)(8 6 2)(7 0 5))))
          ;check if size is Valid
          ;read in puzzleFile into puzzle list
          ;check if solvable <- he does give us a solvable function

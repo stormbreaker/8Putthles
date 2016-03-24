@@ -18,7 +18,8 @@
     )
 )
 
-; call the fileio function, passing the first command-line argument as an input filename
+(defun userinput (&puzzlelist)
+)
 
 ;For testing purposes to test this function independently
 ;(setf puzzle (fileio(car *args*)))

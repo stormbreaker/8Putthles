@@ -95,100 +95,104 @@
 #|----------------------------------------------------|#
 
 ;generates successors from the current state - should work for all versions
-(defun generate-successors ('state 'node)
+(defun generate-successors (state node)
     (let    (
-             (defvar successor-list) ;will become a list of node sturcture
-             (defvar sublistCounter '0) (defvar elementCounter) 
-             (defvar position '(0 0)) (defvar successorNode) 
-             (defvar size)(defvar right 1)
-             (defvar left -1)(defvar up 1)
-             (defvar down -1)
-             (defvar newState)
+             ( sublistCounter 0 )
+             successor-list ;will become a list of node sturcture
+             elementCounter
+             ( position '(0 0)) successorNode
+             size (right 1)
+             (left -1) ( up 1)
+             (down -1)
+             (newState)
             )
+            (setf sublistCounter 0)
+            (setf position '(0 0))
+            
             ;needs a list <- run until all successors generated
             ;assume no successors have been made
             ;state is the parrent state
             ;find 0 in state
             (block search-for-0
-                (dolist (sublist 'state)
+                (dolist (sublist state)
                     (setf elementCounter 0)
-                    (dolist (element 'sublist)
-                        (if (= 'element 0) (return-from search-for-0))
+                    (dolist (element sublist)
+                        (if (= element 0) (return-from search-for-0))
                         (1+ elementCounter)
                     )
                     (1+ sublistCounter)
                 )
             )
             ;sets position of 0
-            (setf (car 'position) elementCounter)
-            (setf (cadr 'position) sublistCounter)
-            (setf size (list-length 'state));gets the length of state-> 2d list, must be same width and height
+            (setf (car position) elementCounter)
+            (setf (cadr position) sublistCounter)
+            (setf size (list-length state));gets the length of state-> 2d list, must be same width and height
             
             ;if the car of position is 0, only horizantal movement is to the right
             (cond 
-                ((= (car 'position) 0) (setf newState (swapPoints 'state 'position 'right '0))
+                ((= (car position) 0) (setf newState (swapPoints state position right 0))
                     ;make a successorNode with new state
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
                     
                     ;put in list 
-                    (append 'successor-list 'successorNode)
+                    (append successor-list successorNode)
                 )
             
                 ;if the car of position is size -1, only horizantal movement is to the left
-                ((= (car 'position) (- size 1)) (setf newState (swapPoints 'state 'position 'left 0))
+                ((= (car position) (- size 1)) (setf newState (swapPoints state position left 0))
                     ;make a successorNode with new state
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
                     ;put in list
-                    (append 'successor-list 'successorNode)
+                    (append successor-list successorNode)
                                                 
                 )
             
                 ;else can move both
-                (t (swapPoints 'state 'position 'left 0)
+                (t (swapPoints state position left 0)
                     ;put in list
                     
-                    (swapPoints 'state 'position 'right 0)
+                    (swapPoints state position right 0)
                     ;put in list
-                    (append 'successor-list 'successorNode)
+                    (append successor-list successorNode)
                 )
             )
             
             ;if the cdr of position is 0, only vertical movement is down
             (cond
-                ((= (cadr 'position) 0) (setf newState (swapPoints 'state 'position 0 'down))
+                ((= (cadr position) 0) (setf newState (swapPoints state position 0 down))
                     ;make a successorNode with new state
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
                     ;put in list
-                    (append 'successor-list 'successorNode)
+                    (append successor-list successorNode)
                 )
                 ;if the cdr of position is size -1, only vertical movement is up
-                ((= (cadr 'position) (- size 1)) (setf newState (swapPoints 'state 'position 0 'up))
+                ((= (cadr position) (- size 1)) (setf newState (swapPoints state position 0 up))
                     ;make a successorNode with new state
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
                     ;put in list
-                    (append 'successor-list 'successorNode)
+                    (append successor-list successorNode)
                 )
                 ;else can move both
-                (t (swapPoints 'state 'position 0 'down)
+                (t (swapPoints state position 0 down)
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
                 ;put in list
             
-                    (swapPoints 'state 'position 0 'up)
+                    (swapPoints state position 0 up)
                     ;make a successorNode with new state
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
                     ;put in list
-                    (append 'successor-list 'successorNode)
+                    (append successor-list successorNode)
                 )
             )
-            'succesor-list
+            (eval successor-list)
     )
 )
     
 ;returns true if goal state <- version only works on basic puzzle
 (defun goal-state (state)
     (if (null (equal (car state) '(1 2 3))) (return-from goal-state nil))
-    (if (null (equal (cadr state) '(4 0 5))) (return-from goal-state nil))
-    (if (null (equal (caddr state) '(6 7 8))) (return-from goal-state nil))
+    (if (null (equal (cadr state) '(8 0 4))) (return-from goal-state nil))
+    (if (null (equal (caddr state) '(7 6 5))) (return-from goal-state nil))
     t
 )
 

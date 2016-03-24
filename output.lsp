@@ -12,10 +12,9 @@ Date March 2016
     print the solution path"
     ;TODO find where the empty spot is, and follow the moves, actually all of this
 
-    (format t "~A" (car puzzle))
-    (format t "~A\n" (cadr puzzle))
-    (format t "~A\n" (cdr puzzle))
-    (format t "hello")
+    (format t "~A~%" (car puzzle))
+    (format t "~A~%" (cadr puzzle))
+    (format t "~A~%" (cdr puzzle))
 )
 
 ; output the formatted puzzle
@@ -32,7 +31,21 @@ Date March 2016
 (defun prt_row (row)
     "(prt_row row) prints a row of n elements for a tile puzzle"
     (cond
-        ((null (cdr row)) (format t "~D~%" (car row)))
-        (t (format t "~D " (car row)) (prt_row (cdr row)))
+        ((null (cdr row)) (prt_elem (car row) t))
+        (t (prt_elem (car row) nil) (prt_row (cdr row)))
+    )
+)
+
+; prints a single element of the puzzle
+(defun prt_elem (elem end_row)
+    "(prt_elem elem) prints an element of a puzzle's row, unless blank"
+    (cond
+        ((equal '0 elem) (format t " "))
+        (t (format t "~D" elem))
+    )
+
+    (cond
+        ((null end_row) (format t " ")) ; print space if not at the end of the row
+        (t (format t "~%")) ; print new line if at the end of the row
     )
 )

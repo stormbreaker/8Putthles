@@ -6,7 +6,7 @@ Posted Spring 2016 for SDSM&T CSC447/547 Artificial Intelligence.
 Modifier: Benjamin Kaiser
 Modified March 19, 2016 for use in Program 2 - 8 Puzzles Artificial Intelligence
 |#
-(defun fileio (filename size)
+(defun fileio (filename)
     "(fileio filename): open a puzzle input file and read the data"
 	(let (datahold)
       ; check for correct usage
@@ -26,15 +26,25 @@ Modified March 19, 2016 for use in Program 2 - 8 Puzzles Artificial Intelligence
 	)
 )
 
-(defun userinput(size)
-	(let (temp temppuzzle (count 0))
+(defun userinput()
+	(let (temp temppuzzle)
 		(do ((data (read) (read)))
-			;theoretically does nested sublists - theoretically
-			((eq data -1) (return-from userinput (reverse temppuzzle)))
-			(if (= count size) (push (reverse temp) temppuzzle))
-			(push data temp)
-			(1+ count)		
+			((equal data -1) (return-from userinput (reverse temppuzzle)))
+			(push data temppuzzle)
 		)
+	)
+)
+
+(defun getNested(size puzzlelist)
+	(let ((count 0) temppuzzle tempsub temppos)
+		;loop to go through the puzzle list
+		(dolist (temppos puzzlelist) (reverse temppuzzle)
+			(push temppos tempsub)
+			(incf count)
+			(when (equal count size) (push (reverse tempsub) temppuzzle) (setf count 0) (setf tempsub nil))
+			;(break)
+		)
+		(reverse temppuzzle)
 	)
 )
 
@@ -48,8 +58,12 @@ Modified March 19, 2016 for use in Program 2 - 8 Puzzles Artificial Intelligence
 ;For testing purposes to test this function independently
 (setf puzsize (entersize))
 
-(setf puzzle (fileio (car *args*) puzsize))
+(setf puzzle (fileio (car *args*)))
 
-(setf userpuz (userinput puzsize))
+(setf userpuz (userinput))
+
+(setf newpuzzle (getNested puzsize puzzle))
+
+(setf newuserpuz (getNested puzsize userpuz))
 
 

@@ -100,104 +100,129 @@
              ( sublistCounter 0 )
              successor-list ;will become a list of node sturcture
              elementCounter
-             ( position '(0 0)) successorNode
+             ( curPosition '(0 0)) successorNode
              size (right 1)
              (left -1) ( up 1)
              (down -1)
              (newState)
             )
-            (setf sublistCounter 0)
-            (setf position '(0 0))
             
             ;needs a list <- run until all successors generated
             ;assume no successors have been made
             ;state is the parrent state
             ;find 0 in state
-            (block search-for-0
-                (dolist (sublist state)
-                    (setf elementCounter 0)
+            (block search-for-0 ;pointer to break from loop
+                (dolist (sublist state) ;2d list
+                    (setf elementCounter 0) ;reset x value
                     (dolist (element sublist)
-                        (if (= element 0) (return-from search-for-0))
-                        (1+ elementCounter)
+                        (if (= element 0) (return-from search-for-0)
+                        (incf elementCounter)) ; increment x-value
                     )
-                    (1+ sublistCounter)
+                    (incf sublistCounter) ;increment y-value
                 )
             )
-            ;sets position of 0
-            (setf (car position) elementCounter)
-            (setf (cadr position) sublistCounter)
+            ;sets curPosition of 0
+            (setf (car curPosition) elementCounter)
+            (setf (cdr curPosition) sublistCounter)
             (setf size (list-length state));gets the length of state-> 2d list, must be same width and height
             
-            ;if the car of position is 0, only horizantal movement is to the right
+            ;if the car of curPosition is 0, only horizantal movement is to the right
             (cond 
-                ((= (car position) 0) (setf newState (swapPoints state position right 0))
+                ((= (car curPosition) 0) (setf newState (swapPoints state curPosition right 0))
                     ;make a successorNode with new state
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
                     
                     ;put in list 
-                    (append successor-list successorNode)
+                    (setf successor-list (append successor-list (list successorNode)))
                 )
             
-                ;if the car of position is size -1, only horizantal movement is to the left
-                ((= (car position) (- size 1)) (setf newState (swapPoints state position left 0))
+                ;if the car of curPosition is size -1, only horizantal movement is to the left
+                ((= (car curPosition) (- size 1)) (setf newState (swapPoints state curPosition left 0))
                     ;make a successorNode with new state
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
                     ;put in list
-                    (append successor-list successorNode)
+                    (setf successor-list (append successor-list (list successorNode)))
                                                 
                 )
             
                 ;else can move both
-                (t (swapPoints state position left 0)
+                (t 
+                    (setf newState (swapPoints state curPosition left 0))
+                    ;make a successorNode with new state
+                    (setf successorNode (make-node :state newState :parent node));sets up one successor
                     ;put in list
+                    (setf successor-list (append successor-list (list successorNode)))
                     
-                    (swapPoints state position right 0)
+                    (setf newState (swapPoints state curPosition right 0))
+                    ;make a successorNode with new state
+                    (setf successorNode (make-node :state newState :parent node));sets up one successor
                     ;put in list
-                    (append successor-list successorNode)
+                    (setf successor-list (append successor-list (list successorNode)))
                 )
             )
             
-            ;if the cdr of position is 0, only vertical movement is down
+            ;if the cdr of curPosition is 0, only vertical movement is down
             (cond
-                ((= (cadr position) 0) (setf newState (swapPoints state position 0 down))
+                ((= (cdr curPosition) 0) (setf newState (swapPoints state curPosition 0 down))
                     ;make a successorNode with new state
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
                     ;put in list
-                    (append successor-list successorNode)
+                    (setf successor-list (append successor-list (list successorNode)))
                 )
-                ;if the cdr of position is size -1, only vertical movement is up
-                ((= (cadr position) (- size 1)) (setf newState (swapPoints state position 0 up))
+                ;if the cdr of curPosition is size -1, only vertical movement is up
+                ((= (cdr curPosition) (- size 1)) (setf newState (swapPoints state curPosition 0 up))
                     ;make a successorNode with new state
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
                     ;put in list
-                    (append successor-list successorNode)
+                    (setf successor-list (append successor-list (list successorNode)))
                 )
                 ;else can move both
-                (t (swapPoints state position 0 down)
+                (t 
+                    (setf newState (swapPoints state curPosition 0 down))
+                    ;make node
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
-                ;put in list
+                    ;put in list
+                    (setf successor-list (append successor-list (list successorNode)))
             
-                    (swapPoints state position 0 up)
+                    (setf newState (swapPoints state curPosition 0 up))
                     ;make a successorNode with new state
                     (setf successorNode (make-node :state newState :parent node));sets up one successor
                     ;put in list
-                    (append successor-list successorNode)
+                    (setf successor-list (append successor-list (list successorNode)))
                 )
             )
-            (eval successor-list)
+            (format t "successor-list = ~S~%" successor-list)
+            successor-list
     )
 )
     
 ;returns true if goal state <- version only works on basic puzzle
 (defun goal-state (state)
     (if (null (equal (car state) '(1 2 3))) (return-from goal-state nil))
-    (if (null (equal (cadr state) '(8 0 4))) (return-from goal-state nil))
-    (if (null (equal (caddr state) '(7 6 5))) (return-from goal-state nil))
+    (if (null (equal (cdr state) '(8 0 4))) (return-from goal-state nil))
+    (if (null (equal (cadr state) '(7 6 5))) (return-from goal-state nil))
     t
 )
 
-(defun swapPoints ('state 'position 'right-left 'up-down)
-    (let ()
-         
+(defun swapPoints (state curPosition right-left up-down)
+    (let ((tempState ()))
+         (dolist (subList state)
+             (setf tempState (append tempState (list (copy-list subList))))
+         )
+         (cond
+             ((= right-left 1) ;swap right
+                (rotatef ( nth (car curPosition) ( nth (cdr curPosition) tempState)) ( nth (+ 1 (car curPosition) ) ( nth (cdr curPosition) tempState)) )
+             )
+             ((= right-left -1) ;swap left
+                (rotatef ( nth (car curPosition) ( nth (cdr curPosition) tempState)) ( nth (- 1 (car curPosition) ) ( nth (cdr curPosition) tempState)) )
+              )
+             ((= up-down 1) ;swap up
+                (rotatef ( nth (car curPosition) ( nth (cdr curPosition) tempState)) ( nth (car curPosition) (nth (+ 1 (cdr curPosition)) tempState)) )
+              )
+             ((= up-down -1) ;swap down
+                (rotatef ( nth (car curPosition) ( nth (cdr curPosition) tempState)) ( nth (car curPosition) (nth (- 1 (cdr curPosition)) tempState)) )
+             )
+        )
+        tempstate
     )
 )

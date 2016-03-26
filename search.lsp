@@ -57,27 +57,17 @@ made local variable solution so that the solution was forced to be
 
             ; termination condition - return solution path when goal is found
             ((if (goal-state (node-state curNode)) (setf solution (build-solution curNode CLOSED))))
-            (format t "past goal state~%")
-
-            (format t "OPEN = ~s~%" OPEN)
 
             ; loop body
             (when (null OPEN) (return nil))             ; no solution
-            (format t "starting loop~%")
 
             ; get current node from OPEN, update OPEN and CLOSED
             (setf curNode (car OPEN))
             (setf OPEN (cdr OPEN))
             (setf CLOSED (cons curNode CLOSED))
 
-            (format t "After open and close update~%")
-            (format t "curNode = ~s~%" curNode)
-
             ; add successors of current node to OPEN
             (dolist (child (generate-successors (node-state curNode)))
-                (format t "top of dolist~%")
-                (format t "OPEN = ~s~%" OPEN)
-                (format t "CLOSED = ~s~%" CLOSED)
 
                 ; for each child node
                 (setf child (make-node :state child :parent (node-state curNode)))
@@ -116,10 +106,6 @@ made local variable solution so that the solution was forced to be
     (do
         ((path (list (node-state node))))        ; local loop var
         ((null (node-parent node)) path)         ; termination condition
-        
-        (format t "Top of do in build-solution~%")
-        (format t "node = ~s~%" node)
-        (format t "node-list = ~s~%" node-list)
 
         ; find the parent of the current node
         (setf node (member-state (node-parent node) node-list))

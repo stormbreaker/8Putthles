@@ -45,60 +45,62 @@ had to fix the termination condition so that the do loop would even run
 
 ; Given a start state and a search type (BFS or DFS), return a path from the start to the goal.
 (defun search_bfs_dfs (start type)
-    (do*                                                    ; note use of sequential DO*
-        (                                                   ; initialize local loop vars
-            (curNode (make-node :state start :parent nil))  ; current node: (start nil)
-            (OPEN (list curNode))                           ; OPEN list:    ((start nil))
-            (CLOSED nil)                                    ; CLOSED list:  ( )
-        )
+    (let (solution)
+        (do*                                                    ; note use of sequential DO*
+            (                                                   ; initialize local loop vars
+                (curNode (make-node :state start :parent nil))  ; current node: (start nil)
+                (OPEN (list curNode))                           ; OPEN list:    ((start nil))
+                (CLOSED nil)                                    ; CLOSED list:  ( )
+            )
 
-        ; termination condition - return solution path when goal is found
-        ((if (goal-state (node-state curNode)) (setf solution (build-solution curNode CLOSED))))
-        (format t "past goal state~%")
-        
-        (format t "OPEN = ~s~%" OPEN)
+            ; termination condition - return solution path when goal is found
+            ((if (goal-state (node-state curNode)) (setf solution (build-solution curNode CLOSED))))
+            (format t "past goal state~%")
 
-        ; loop body
-        (when (null OPEN) (return nil))             ; no solution
-        (format t "starting loop~%")
-
-        ; get current node from OPEN, update OPEN and CLOSED
-        (setf curNode (car OPEN))
-        (setf OPEN (cdr OPEN))
-        (setf CLOSED (cons curNode CLOSED))
-        
-        (format t "After open and close update~%")
-        (format t "curNode = ~s~%" curNode)
-
-        ; add successors of current node to OPEN
-        (dolist (child (generate-successors (node-state curNode)))
-            (format t "top of dolist~%")
             (format t "OPEN = ~s~%" OPEN)
-            (format t "CLOSED = ~s~%" CLOSED)
 
-            ; for each child node
-            (setf child (make-node :state child :parent (node-state curNode)))
+            ; loop body
+            (when (null OPEN) (return nil))             ; no solution
+            (format t "starting loop~%")
 
-            ; if the node is not on OPEN or CLOSED
-            (if (and (not (member child OPEN   :test #'equal-states))
-                     (not (member child CLOSED :test #'equal-states)))
+            ; get current node from OPEN, update OPEN and CLOSED
+            (setf curNode (car OPEN))
+            (setf OPEN (cdr OPEN))
+            (setf CLOSED (cons curNode CLOSED))
 
-                ; add it to the OPEN list
-                (cond
+            (format t "After open and close update~%")
+            (format t "curNode = ~s~%" curNode)
 
-                    ; BFS - add to end of OPEN list (queue)
-                    ((eq type 'bfs) (setf OPEN (append OPEN (list child))))
+            ; add successors of current node to OPEN
+            (dolist (child (generate-successors (node-state curNode)))
+                (format t "top of dolist~%")
+                (format t "OPEN = ~s~%" OPEN)
+                (format t "CLOSED = ~s~%" CLOSED)
 
-                    ; DFS - add to start of OPEN list (stack)
-                    ((eq type 'dfs) (setf OPEN (cons child OPEN)))
+                ; for each child node
+                (setf child (make-node :state child :parent (node-state curNode)))
 
-                    ; error handling for incorrect usage
-                    (t (format t "SEARCH: bad search type! ~s~%" type) (return nil))
+                ; if the node is not on OPEN or CLOSED
+                (if (and (not (member child OPEN   :test #'equal-states))
+                         (not (member child CLOSED :test #'equal-states)))
+
+                    ; add it to the OPEN list
+                    (cond
+
+                        ; BFS - add to end of OPEN list (queue)
+                        ((eq type 'bfs) (setf OPEN (append OPEN (list child))))
+
+                        ; DFS - add to start of OPEN list (stack)
+                        ((eq type 'dfs) (setf OPEN (cons child OPEN)))
+
+                        ; error handling for incorrect usage
+                        (t (format t "SEARCH: bad search type! ~s~%" type) (return nil))
+                    )
                 )
             )
         )
+        solution;makes sure the solution list is the last thing evaluated
     )
-    solution
 )
 
 ;--------------------------------------------------------------------------

@@ -8,7 +8,7 @@
      puzzleFile  
      &optional puzzleSize
     )
-    (let ((defvar 'puzzleList '((1 3 4)(8 6 2)(7 0 5)))) ;set puzzel list to easy puzzel as default
+    (let ((defvar 'puzzleList '((1 3 4)(8 6 2)(7 0 5)))) ;set puzzel list to easy puzzle as default
          ;check if size is Valid
          ;read in puzzleFile into puzzle list
          ;check if solvable <- he does give us a solvable function

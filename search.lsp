@@ -19,9 +19,13 @@ backwards through the parent states.
 Author: John M. Weiss, Ph.D.
 Written Spring 2016 for CSC447/547 AI class.
 
-Modifications:
+Modifications: 
+had to fix the termination condition so that the do loop would even run
+(repeated error of GOAL-STATE not visilbe for RETURN-FROM)
 
 |#
+
+(declaim (ftype (function () t) goal-state))
 
 ;--------------------------------------------------------------------------
 
@@ -49,18 +53,28 @@ Modifications:
         )
 
         ; termination condition - return solution path when goal is found
-        ((goal-state? (node-state curNode)) (build-solution curNode CLOSED))
+        ((if (goal-state (node-state curNode)) (setf solution (build-solution curNode CLOSED))))
+        (format t "past goal state~%")
+        
+        (format t "OPEN = ~s~%" OPEN)
 
         ; loop body
         (when (null OPEN) (return nil))             ; no solution
+        (format t "starting loop~%")
 
         ; get current node from OPEN, update OPEN and CLOSED
         (setf curNode (car OPEN))
         (setf OPEN (cdr OPEN))
         (setf CLOSED (cons curNode CLOSED))
+        
+        (format t "After open and close update~%")
+        (format t "curNode = ~s~%" curNode)
 
         ; add successors of current node to OPEN
         (dolist (child (generate-successors (node-state curNode)))
+            (format t "top of dolist~%")
+            (format t "OPEN = ~s~%" OPEN)
+            (format t "CLOSED = ~s~%" CLOSED)
 
             ; for each child node
             (setf child (make-node :state child :parent (node-state curNode)))
@@ -84,6 +98,7 @@ Modifications:
             )
         )
     )
+    solution
 )
 
 ;--------------------------------------------------------------------------
@@ -95,12 +110,19 @@ Modifications:
     (do
         ((path (list (node-state node))))        ; local loop var
         ((null (node-parent node)) path)         ; termination condition
+        
+        (format t "Top of do in build-solution~%")
+        (format t "node = ~s~%" node)
+        (format t "node-list = ~s~%" node-list)
 
         ; find the parent of the current node
         (setf node (member-state (node-parent node) node-list))
+        (format t "node after setf = ~s~%" node)
 
         ; add it to the path
         (setf path (cons (node-state node) path))
+        (format t "path after setf = ~s~%" path)
+        path
     )
 )
 
@@ -109,4 +131,26 @@ Modifications:
     (dolist (node node-list)
         (when (equal state (node-state node)) (return node))
     )
+)
+
+;------------------------------------------------------------------------------
+;needed functions
+;------------------------------------------------------------------------------
+;returns true if goal state <- version only works on basic puzzle
+#|
+(defun goal-state (state)
+    (cond
+        ((null (equal (car state) '(1 2 3))) (nil))
+        ((null (equal (cadr state) '(8 0 4))) (nil))
+        ((null (equal (caddr state) '(7 6 5))) (nil))
+        (t t)
+    )
+)
+|#
+;returns true if goal state <- version only works on basic puzzle
+(defun goal-state (state)
+    (if (null (equal (car state) '(1 2 3))) (return-from goal-state nil))
+    (if (null (equal (cadr state) '(8 0 4))) (return-from goal-state nil))
+    (if (null (equal (caddr state) '(7 6 5))) (return-from goal-state nil))
+    t
 )

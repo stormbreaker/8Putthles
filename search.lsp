@@ -32,7 +32,7 @@ made local variable solution so that the solution was forced to be
 ;--------------------------------------------------------------------------
 
 ; Node structure: stores state and parent.
-(defstruct node state parent)
+(defstruct node state parent heuristic depth)
 
 ; Test if two nodes have the same state.
 (defun equal-states (n1 n2) (equal (node-state n1) (node-state n2)))
@@ -45,12 +45,20 @@ made local variable solution so that the solution was forced to be
 ; Depth-first-search implements the OPEN list as a STACK of (state parent) nodes.
 (defun dfs (start) (search_bfs_dfs start 'dfs))
 
+; A* search, sorts the OPEN list based on heurist value
+(defun aStar (start) (serach-bfs_dfs start 'aStar))
+
 ; Given a start state and a search type (BFS or DFS), return a path from the start to the goal.
-(defun search_bfs_dfs (start type)
+(defun search_bfs_dfs 
+    (
+     start type
+           
+     &optional (heuristicVal (lambda () 0))     
+    )
     (let (solution)
         (do*                                                    ; note use of sequential DO*
             (                                                   ; initialize local loop vars
-                (curNode (make-node :state start :parent nil))  ; current node: (start nil)
+                (curNode (make-node :state start :parent nil :heuristic (eval #'heuristicVal) :depth 0 ))  ; current node: (start nil)
                 (OPEN (list curNode))                           ; OPEN list:    ((start nil))
                 (CLOSED nil)                                    ; CLOSED list:  ( )
             )
@@ -70,7 +78,7 @@ made local variable solution so that the solution was forced to be
             (dolist (child (generate-successors (node-state curNode)))
 
                 ; for each child node
-                (setf child (make-node :state child :parent (node-state curNode)))
+                (setf child (make-node :state child :parent (node-state curNode) :heuristic (+ (+ 1 ( node-depth curNode )) (heuristicVal)) :depth (+ 1 ( node-depth curNode ))))
 
                 ; if the node is not on OPEN or CLOSED
                 (if (and (not (member child OPEN   :test #'equal-states))
@@ -126,7 +134,7 @@ made local variable solution so that the solution was forced to be
 )
 
 ;------------------------------------------------------------------------------
-;needed functions
+;needed functions and added functions
 ;------------------------------------------------------------------------------
 ;returns true if goal state <- version only works on basic puzzle
 ;returns true if goal state <- version only works on basic puzzle
@@ -135,4 +143,9 @@ made local variable solution so that the solution was forced to be
     (if (null (equal (cadr state) '(8 0 4))) (return-from goal-state nil))
     (if (null (equal (caddr state) '(7 6 5))) (return-from goal-state nil))
     t
+)
+
+;returns 0
+(defun zero ()
+    0
 )

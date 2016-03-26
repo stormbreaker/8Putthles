@@ -30,6 +30,7 @@ Return: This function returns the content of the file in a list.
 		)
 	)
 )
+
 #|
 Name: userinput
 Author: Benjamin Kaiser
@@ -45,6 +46,7 @@ Return: a list of the values which were input by the user.  -1 terminates the li
 		)
 	)
 )
+
 #|
 Name: getNested
 Author: Benjamin Kaiser
@@ -66,6 +68,7 @@ Return:
 		(reverse temppuzzle)
 	)
 )
+
 #|
 Name: entersize
 Author: Benjamin Kaiser

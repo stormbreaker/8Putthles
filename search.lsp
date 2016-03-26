@@ -21,7 +21,9 @@ Written Spring 2016 for CSC447/547 AI class.
 
 Modifications: 
 had to fix the termination condition so that the do loop would even run
-(repeated error of GOAL-STATE not visilbe for RETURN-FROM)
+    (repeated error of GOAL-STATE not visilbe for RETURN-FROM)
+made local variable solution so that the solution was forced to be
+    the last thing evaluated
 
 |#
 
@@ -92,6 +94,8 @@ had to fix the termination condition so that the do loop would even run
 
                         ; DFS - add to start of OPEN list (stack)
                         ((eq type 'dfs) (setf OPEN (cons child OPEN)))
+                        
+                        ; A*  - add to end of open list and sort after
 
                         ; error handling for incorrect usage
                         (t (format t "SEARCH: bad search type! ~s~%" type) (return nil))
@@ -139,16 +143,6 @@ had to fix the termination condition so that the do loop would even run
 ;needed functions
 ;------------------------------------------------------------------------------
 ;returns true if goal state <- version only works on basic puzzle
-#|
-(defun goal-state (state)
-    (cond
-        ((null (equal (car state) '(1 2 3))) (nil))
-        ((null (equal (cadr state) '(8 0 4))) (nil))
-        ((null (equal (caddr state) '(7 6 5))) (nil))
-        (t t)
-    )
-)
-|#
 ;returns true if goal state <- version only works on basic puzzle
 (defun goal-state (state)
     (if (null (equal (car state) '(1 2 3))) (return-from goal-state nil))

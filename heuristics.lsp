@@ -24,7 +24,16 @@ Return:
 )
 
 (defun calcManhattan (puzzle)
-	(let (sum)
-		
+	(let ((sum 0) (colI 0) (rowI 0) (loc))
+		(dolist (row puzzle)
+			(dolist (tile row)
+				(setf loc nil)
+				(push colI loc)
+				(push rowI loc)
+				(setf sum (+ sum (tileDistance loc puzzle))
+				(incf colI)
+			)
+			(incf rowI)
+		)
 	)
 )

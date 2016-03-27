@@ -46,7 +46,7 @@ made local variable solution so that the solution was forced to be
 (defun dfs (start) (search_bfs_dfs start 'dfs #'(lambda () 0)))
 
 ; A* search, sorts the OPEN list based on heurist value
-(defun aStar (start) (serach-bfs_dfs start 'aStar))
+(defun aStar (start heuristic) (search_bfs_dfs start 'aStar heuristic))
 
 ; Given a start state and a search type (BFS or DFS), return a path from the start to the goal.
 (defun search_bfs_dfs 
@@ -68,6 +68,12 @@ made local variable solution so that the solution was forced to be
             ; loop body
             (when (null OPEN) (return nil))             ; no solution
 
+            (if (eq type 'aStar) (format t "OPEN: before sort ~s~%" OPEN) )
+            ;This is where the sort must happen for aStar
+            (if (eq type 'aStar) (sort OPEN #'< :key #'node-heuristic))
+            
+            (if (eq type 'aStar) (format t "OPEN: before sort ~s~%" OPEN) )
+            
             ; get current node from OPEN, update OPEN and CLOSED
             (setf curNode (car OPEN))
             (setf OPEN (cdr OPEN))
@@ -93,6 +99,7 @@ made local variable solution so that the solution was forced to be
                         ((eq type 'dfs) (setf OPEN (cons child OPEN)))
                         
                         ; A*  - add to end of open list and sort after
+                        ((eq type 'aStar) (setf OPEN (append OPEN (list child))))
 
                         ; error handling for incorrect usage
                         (t (format t "SEARCH: bad search type! ~s~%" type) (return nil))

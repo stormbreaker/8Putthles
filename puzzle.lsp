@@ -227,3 +227,34 @@
         tempstate
     )
 )
+
+(defun simpleHeuristic (state)
+    (let (
+            (count 0)
+            (elementCounter 0) (sublistCounter 0)
+            goalState
+        )
+
+        ;set goalState
+        (setf goalState (generateGoalState (list-length state)))
+
+        (dolist (sublist state) ;2d list
+            (setf elementCounter 0) ;reset x value
+            (dolist (element sublist)
+                (if (/= element ( nth elementCOunter ( nth sublistCounter goalState))) (incf count))
+                (incf elementCounter) ; increment x-value
+            )
+            (incf sublistCounter) ;increment y-value
+        )
+        count
+    )
+)
+
+(defun generateGoalState ( length )
+
+    ;use length to generalize
+    
+    ;currently just 8Puzzle though
+    '((1 2 3)(8 0 4)(7 6 5)) ;return solution
+
+)

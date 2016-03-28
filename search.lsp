@@ -40,10 +40,10 @@ made local variable solution so that the solution was forced to be
 ;--------------------------------------------------------------------------
 
 ; Breadth-first-search implements the OPEN list as a QUEUE of (state parent) nodes.
-(defun bfs (start) (search_bfs_dfs start 'bfs #'(lambda () 0)))
+(defun bfs (start) (search_bfs_dfs start 'bfs #'(lambda (state) 0)))
 
 ; Depth-first-search implements the OPEN list as a STACK of (state parent) nodes.
-(defun dfs (start) (search_bfs_dfs start 'dfs #'(lambda () 0)))
+(defun dfs (start) (search_bfs_dfs start 'dfs #'(lambda (state) 0)))
 
 ; A* search, sorts the OPEN list based on heurist value
 (defun aStar (start heuristic) (search_bfs_dfs start 'aStar heuristic))
@@ -52,12 +52,12 @@ made local variable solution so that the solution was forced to be
 (defun search_bfs_dfs 
     (
      start type
-     heuristicVal     
+     heuristicVal   
     )
     (let (solution)
         (do*                                                    ; note use of sequential DO*
             (                                                   ; initialize local loop vars
-                (curNode (make-node :state start :parent nil :heuristic (funcall heuristicVal) :depth 0 ))  ; current node: (start nil)
+                (curNode (make-node :state start :parent nil :heuristic (funcall heuristicVal start) :depth 0 ))  ; current node: (start nil)
                 (OPEN (list curNode))                           ; OPEN list:    ((start nil))
                 (CLOSED nil)                                    ; CLOSED list:  ( )
             )
@@ -83,7 +83,7 @@ made local variable solution so that the solution was forced to be
             (dolist (child (generate-successors (node-state curNode)))
 
                 ; for each child node
-                (setf child (make-node :state child :parent (node-state curNode) :heuristic (+ (+ 1 ( node-depth curNode )) (funcall heuristicVal)) :depth (+ 1 ( node-depth curNode ))))
+                (setf child (make-node :state child :parent (node-state curNode) :heuristic (+ (+ 1 ( node-depth curNode )) (funcall heuristicVal (node-state curNode))) :depth (+ 1 ( node-depth curNode ))))
 
                 ; if the node is not on OPEN or CLOSED
                 (if (and (not (member child OPEN   :test #'equal-states))

@@ -2,7 +2,7 @@
 Name: tileDistance
 Author: Benjamin Kaiser
 Description: This function 
-Parameters:
+Parameters: loc is a list of length 2 which contians the x and y
 Return: 
 |#
 

@@ -137,13 +137,13 @@ Added aStar method - this caused the overall function to require a
                 )
             )
         )
-         (if (or solution (= (node-depth (car CLOSED)) maxDepth))
-             (setf solution 
-                   (search_bfs_dfs start 'dfsID 
-                                   #'(lambda (state) (+ 1 maxDepth))
-                   )
-             ) 
-         )
+        (if (and (not solution) (= (node-depth (car CLOSED)) maxDepth))
+            (setf solution 
+                (search_bfs_dfs start 'dfsID 
+                               #'(lambda (state) (+ 1 maxDepth))
+                )
+            ) 
+        )
         solution;makes sure the solution list is the last thing evaluated
     )
 )

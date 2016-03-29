@@ -19,14 +19,26 @@ backwards through the parent states.
 Author: John M. Weiss, Ph.D.
 Written Spring 2016 for CSC447/547 AI class.
 
-Modifications:
+Modifications: 
+had to fix the termination condition so that the do loop would even run
+    (repeated error of GOAL-STATE not visilbe for RETURN-FROM)
+made local variable solution so that the solution was forced to be
+    the last thing evaluated
+Added aStar method - this caused the overall function to require a 
+    heuristic function to generate values for each state. Any function
+    can be passed into bfs and dfs because they do not use the 
+    heuristic value - the aStar value does sort the open list based
+    on the heuristic value before it expends another node from the open
+    list.
 
 |#
+
+(declaim (ftype (function () t) goal-state))
 
 ;--------------------------------------------------------------------------
 
 ; Node structure: stores state and parent.
-(defstruct node state parent)
+(defstruct node state parent heuristic depth)
 
 ; Test if two nodes have the same state.
 (defun equal-states (n1 n2) (equal (node-state n1) (node-state n2)))
@@ -34,55 +46,82 @@ Modifications:
 ;--------------------------------------------------------------------------
 
 ; Breadth-first-search implements the OPEN list as a QUEUE of (state parent) nodes.
-(defun bfs (start) (search_bfs_dfs start 'bfs))
+(defun bfs (start) (search_bfs_dfs start 'bfs #'(lambda (state) 0)))
 
 ; Depth-first-search implements the OPEN list as a STACK of (state parent) nodes.
-(defun dfs (start) (search_bfs_dfs start 'dfs))
+(defun dfs (start) (search_bfs_dfs start 'dfs #'(lambda (state) 0)))
+
+; A* search, sorts the OPEN list based on heurist value
+(defun aStar (start heuristic) (search_bfs_dfs start 'aStar heuristic))
 
 ; Given a start state and a search type (BFS or DFS), return a path from the start to the goal.
-(defun search_bfs_dfs (start type)
-    (do*                                                    ; note use of sequential DO*
-        (                                                   ; initialize local loop vars
-            (curNode (make-node :state start :parent nil))  ; current node: (start nil)
-            (OPEN (list curNode))                           ; OPEN list:    ((start nil))
-            (CLOSED nil)                                    ; CLOSED list:  ( )
-        )
+(defun search_bfs_dfs 
+    (
+     start type
+     heuristicVal   
+    )
+    (let (solution)
+        (do*                                                    ; note use of sequential DO*
+            (                                                   ; initialize local loop vars
+                (curNode (make-node :state start :parent nil 
+                                    :heuristic (funcall heuristicVal start) 
+                                    :depth 0 ))  ; current node: (start nil)
+                (OPEN (list curNode))                           ; OPEN list:    ((start nil))
+                (CLOSED nil)                                    ; CLOSED list:  ( )
+            )
 
-        ; termination condition - return solution path when goal is found
-        ((goal-state? (node-state curNode)) (build-solution curNode CLOSED))
+            ; termination condition - return solution path when goal is found
+            ((if (goal-state (node-state curNode)) (setf solution (build-solution curNode CLOSED))))
 
-        ; loop body
-        (when (null OPEN) (return nil))             ; no solution
+            ; loop body
+            (when (null OPEN) (return nil))             ; no solution
 
-        ; get current node from OPEN, update OPEN and CLOSED
-        (setf curNode (car OPEN))
-        (setf OPEN (cdr OPEN))
-        (setf CLOSED (cons curNode CLOSED))
+            ;This is where the sort must happen for aStar
+            (if (eq type 'aStar) (sort OPEN #'< :key #'node-heuristic))
+            
+            ; get current node from OPEN, update OPEN and CLOSED
+            (setf curNode (car OPEN))
+            (setf OPEN (cdr OPEN))
+            (setf CLOSED (cons curNode CLOSED))
+            
+            (incf *nodesExpanded* 1) ;Global count of nodes expanded
+                  ;this variable requires outside sources to reset
 
-        ; add successors of current node to OPEN
-        (dolist (child (generate-successors (node-state curNode)))
+            ; add successors of current node to OPEN
+            (dolist (child (generate-successors (node-state curNode)))
 
-            ; for each child node
-            (setf child (make-node :state child :parent (node-state curNode)))
+                ; for each child node
+                (setf child (make-node :state child 
+                                       :parent (node-state curNode) 
+                                       :heuristic (+ (+ 1 ( node-depth curNode )) (funcall heuristicVal (node-state curNode))) 
+                                       :depth (+ 1 ( node-depth curNode ))))
+                
+                (incf *nodesGenerated* 1) ;Global count of nodes generated
+                  ;this variable requires outside sources to reset
 
-            ; if the node is not on OPEN or CLOSED
-            (if (and (not (member child OPEN   :test #'equal-states))
-                     (not (member child CLOSED :test #'equal-states)))
+                ; if the node is not on OPEN or CLOSED
+                (if (and (not (member child OPEN   :test #'equal-states))
+                         (not (member child CLOSED :test #'equal-states)))
 
-                ; add it to the OPEN list
-                (cond
+                    ; add it to the OPEN list
+                    (cond
 
-                    ; BFS - add to end of OPEN list (queue)
-                    ((eq type 'bfs) (setf OPEN (append OPEN (list child))))
+                        ; BFS - add to end of OPEN list (queue)
+                        ((eq type 'bfs) (setf OPEN (append OPEN (list child))))
 
-                    ; DFS - add to start of OPEN list (stack)
-                    ((eq type 'dfs) (setf OPEN (cons child OPEN)))
+                        ; DFS - add to start of OPEN list (stack)
+                        ((eq type 'dfs) (setf OPEN (cons child OPEN)))
+                        
+                        ; A*  - add to end of open list and sort after
+                        ((eq type 'aStar) (setf OPEN (append OPEN (list child))))
 
-                    ; error handling for incorrect usage
-                    (t (format t "SEARCH: bad search type! ~s~%" type) (return nil))
+                        ; error handling for incorrect usage
+                        (t (format t "SEARCH: bad search type! ~s~%" type) (return nil))
+                    )
                 )
             )
         )
+        solution;makes sure the solution list is the last thing evaluated
     )
 )
 
@@ -101,6 +140,7 @@ Modifications:
 
         ; add it to the path
         (setf path (cons (node-state node) path))
+        path
     )
 )
 

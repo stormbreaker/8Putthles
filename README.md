@@ -44,3 +44,5 @@ Generalize the 8-puzzle to the N-puzzle, where N may be 32
 2
 -1=24, etc. You may need to add the puzzle size to the command-line arguments and puzzle
 file format.
+
+problem created by Dr. Weiss

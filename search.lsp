@@ -68,7 +68,7 @@ Added aStar method - this caused the overall function to require a
      heuristicVal 
     )
     (let (solution maxDepth (CLOSED nil))
-         (setf maxDepth (funcall heuristicVal 0)) ;uses the heuristic function to pass max depth - only used in dfsID
+         (if (eq type 'dfsID)(setf maxDepth (funcall heuristicVal 0))) ;uses the heuristic function to pass max depth - only used in dfsID
          ( block sequential-DO* 
             (do*                                                    ; note use of sequential DO*
                 (                                                   ; initialize local loop vars
@@ -80,7 +80,7 @@ Added aStar method - this caused the overall function to require a
 
                 ; termination condition - return solution path when goal is found
                 ((if (goal-state (node-state curNode)) (setf solution (build-solution curNode CLOSED))))
-
+                
                 ; loop body
                 (when (null OPEN) (return nil))             ; no solution
 
@@ -119,8 +119,6 @@ Added aStar method - this caused the overall function to require a
 
                             ; if at max depth add to close list
                             ((and (eq type 'dfsID) (= (node-depth child) maxDepth)) 
-                             (format t "added node to closed for dfsID ~%")
-                             (format t "maxDepth = ~s and node-depth = ~s" maxDepth (node-depth child))
                              (setf CLOSED (cons child CLOSED))
                             )
                             
@@ -137,7 +135,7 @@ Added aStar method - this caused the overall function to require a
                 )
             )
         )
-        (if (and (not solution) (= (node-depth (car CLOSED)) maxDepth))
+        (if (and (eq type 'dfsID) (not solution) (= (node-depth (car CLOSED)) maxDepth))
             (setf solution 
                 (search_bfs_dfs start 'dfsID 
                                #'(lambda (state) (+ 1 maxDepth))

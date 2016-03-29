@@ -44,61 +44,49 @@ Return: nothing specific, don't use the return value for this function
          
          
          ;BreathFirstSearch
-         (format t "BFS search: (may take a while)~%")
+         (format t "BFS search: (May take a while)~%")
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
          (setf outPut (bfs puzzleList));return OutputList
-         (prt_sol outPut)
-         (format t "Number of moves required: ~s~%" (list-length output))
-         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
-         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+         (printSolutionBlock outPut)
          
          
          
          ;DepthFirstIteratedDepeningSearch
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
+         (format t "~%~%DFS itterated deepening search: (May take a while)~%")
          (setf outPut (dfsID puzzleList));return OutputList
-         (format t "~%~%DFS itterated deepening search:~%")
-         (format t "Number of moves required: ~s~%" (list-length output))
-         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
-         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+         (printSolutionBlock outPut)
          
          
          
          ;A* admissible #1
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
-         (setf outPut(aStar puzzleList #'simpleHeuristic ));return OutputList
          (format t "~%~%A* Misplaced Tiles search:~%")
-         (prt_sol outPut)
-         (format t "Number of moves required: ~s~%" (list-length output))
-         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
-         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+         (setf outPut(aStar puzzleList #'simpleHeuristic ));return OutputList
+         (printSolutionBlock outPut)
          
          ;A* admissible #2
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
-         (setf outPut(aStar puzzleList #'calcManhattan ));return OutputList
          (format t "~%~%A* Manhattan Distance search:~%")
-         (prt_sol outPut)
-         (format t "Number of moves required: ~s~%" (list-length output))
-         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
-         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+         (setf outPut(aStar puzzleList #'calcManhattan ));return OutputList
+         (printSolutionBlock outPut)
          
          ;A* inadmissible
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
-         (setf outPut (aStar puzzleList #'nilsson ));return OutputList
-<<<<<<< HEAD
-         (format t "A* Nilsson's Sequence Score search:~%")
-         (format t "~s~%" outPut)
-=======
          (format t "~%~%A* Nilsson's Sequence Score search:~%")
-         (prt_sol outPut)
->>>>>>> refs/remotes/origin/master
-         (format t "Number of moves required: ~s~%" (list-length output))
-         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
-         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+         (setf outPut (aStar puzzleList #'nilsson ));return OutputList
+         (printSolutionBlock outPut)
     )
+)
+
+(defun printSolutionBlock (outPut)
+    (format t "     Number of moves required: ~s~%" (list-length output))
+    (format t "     Number of Nodes Generated: ~s~%" *nodesGenerated*)
+    (format t "     Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+    (prt_sol outPut)
 )

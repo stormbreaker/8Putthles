@@ -58,7 +58,7 @@ Return: nothing specific, don't use the return value for this function
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
          (format t "DFS itterated deepening search:~%")
-         ;(setf outPut (dfs puzzleList));return OutputList
+         (setf outPut (dfsID puzzleList));return OutputList
          (format t "Number of moves required: ~s~%" (list-length output))
          (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
          (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)

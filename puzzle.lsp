@@ -42,10 +42,10 @@ Return: nothing specific, don't use the return value for this function
          
          
          ;BreathFirstSearch
+         (format t "BFS search:~%")
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
          (setf outPut (bfs puzzleList));return OutputList
-         (format t "BFS search:~%")
          (format t "~s~%" outPut)
          (format t "Number of moves required: ~s~%" (list-length output))
          (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)

@@ -1,43 +1,90 @@
 ;Load in Dr. Weiss's search code
 (load 'search.lsp)
-(declaim (ftype (function () t) customSearch))
-(declaim (ftype (function () t) swapPoints))
+(load 'read.lsp)
+(load 'heuristics.lsp)
+
+(defvar *nodesGenerated*);includes generated duplicates that did not get added into the open list
+(defvar *nodesExpanded*)
 
 (defun 8puzzle  
     (
-     puzzleFile  
-     &optional puzzleSize
+     &optional puzzleFile 
     )
-    (let ((puzzleList '((1 3 4)(8 6 2)(7 0 5)))) ;set puzzel list to easy puzzle as default
-         ;check if size is Valid
+    (let ((puzzleList '((1 3 4)(8 6 2)(7 0 5))) sublistLength) ;set puzzel list to easy puzzle as default
          ;read in puzzleFile into puzzle list
+         (if (not (null puzzleFile))
+             (setf  puzzleList (fileio puzzlefile)); if
+             (setf puzzleList ( userinput ))    ;else
+         )
+         
+         ;check if size is Valid
+         (setf subListLength (sqrt (list-length puzzleList)));also sets the sublist length
+         (if (not (integerp subListLength))
+             (return-from 8puzzle nil))
+         
          ;check if solvable <- he does give us a solvable function
          
+         
+         ;place into 2d style list (easier for the output guy)
+         (setf puzzleList (getNested sublistLength puzzleList))
+         
+         ;any further checks on the list should go here
+         
+         
+         
          ;BreathFirstSearch
-         (bfs puzzleList);return OutputList
-         (PrintScreen OutputList)
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (setf outPut (bfs puzzleList));return OutputList
+         (format t "BFS search:~%")
+         (format t "~s~%" outPut)
+         (format t "Number of moves required: ~s~%" (list-length output))
+         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
+         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+         
+         
          
          ;DepthFirstIteratedDepeningSearch
-         (dfs puzzleList);return OutputList
-         (printScreen OutputList)
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (format t "DFS itterated deepening search:~%")
+         ;(setf outPut (dfs puzzleList));return OutputList
+         (format t "Number of moves required: ~s~%" (list-length output))
+         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
+         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+         
+         
          
          ;A* admissible #1
-         (aStar puzzleList #'simpleHeuristic );return OutputList
-         (printScreen OutputList)
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (setf outPut(aStar puzzleList #'simpleHeuristic ));return OutputList
+         (format t "A* Misplaced Tiles search:~%")
+         (format t "~s~%" outPut)
+         (format t "Number of moves required: ~s~%" (list-length output))
+         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
+         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
          
          ;A* admissible #2
-         ;(aStar puzzleList #'admissibleHeuristic2 );return OutputList
-         (printScreen OutputList)
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (setf outPut(aStar puzzleList #'calcManhattan ));return OutputList
+         (format t "A* Manhattan Distance search:~%")
+         (format t "~s~%" outPut)
+         (format t "Number of moves required: ~s~%" (list-length output))
+         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
+         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
          
          ;A* inadmissible
-         (aStar puzzleList #'nilsson );return OutputList
-         (printScreen OutputList)
-    )
-)
-
-(defun printScreen  'outputList
-    (let    ()
-            ;actually print to screen
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (setf outPut (aStar puzzleList #'nilsson ));return OutputList
+         (format t "A* Nilsson's Sequence Score search:~%")
+         (printScreen outPut)
+         (format t "~s~%" outPut)
+         (format t "Number of moves required: ~s~%" (list-length output))
+         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
+         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
     )
 )
 
@@ -56,11 +103,7 @@
              (down -1)
              (newState)
             )
-            
-            (format t "Top of generate-successors~%")
-            
-            (format t "state = ~S~%" state)
-            
+                        
             ;needs a list <- run until all successors generated
             ;assume no successors have been made
             ;state is the parrent state
@@ -75,11 +118,9 @@
                     (incf sublistCounter) ;increment y-value
                 )
             )
-            (format t "setting curPosition~%")
             ;sets curPosition of 0
             (setf (car curPosition) elementCounter)
             (setf (cadr curPosition) sublistCounter)
-            (format t "curPosition = ~S~%" curPosition)
             (setf size (list-length state));gets the length of state-> 2d list, must be same width and height
             
             ;if the car of curPosition is 0, only horizantal movement is to the right
@@ -130,7 +171,6 @@
                     (setf successor-list (append successor-list (list newState)))
                 )
             )
-            (format t "successor-list = ~S~%" successor-list)
             successor-list
     )
 )

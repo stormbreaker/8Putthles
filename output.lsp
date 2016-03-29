@@ -24,16 +24,16 @@ Date March 2016
         ; check if we've hit the null point if so don't set
         (cond 
             ((null (car to_prt)) (setf prt1 nil))
-            (t ((setf puzz1 (car to_prt)) (setf prt1 t))))
-        (if (not (null (nth 1 to_prt)))
-            ((setf puzz2 (nth 1 to_prt)) (setf prt2 t))
-            (setf prt2 nil))
-        (if (not (null (nth 2 to_prt)))
-            ((setf puzz3 (nth 2 to_prt)) (setf prt3 t))
-            (setf prt3 nil))
-        (if (not (null (nth 3 to_prt)))
-            ((setf puzz4 (nth 3 to_prt)) (setf prt4 t))
-            (setf prt4 nil))
+            (t (setf puzz1 (car to_prt)) (setf prt1 t)))
+        (cond
+            ((null (nth 1 to_prt)) (setf prt2 nil))
+            (t (setf puzz2 (nth 1 to_prt)) (setf prt2 t)))
+        (cond
+            ((null (nth 2 to_prt)) (setf prt3 nil))
+            (t (setf puzz3 (nth 2 to_prt)) (setf prt3 t)))
+        (cond
+            ((null (nth 3 to_prt)) (setf prt4 nil))
+            (t (setf puzz4 (nth 3 to_prt)) (setf prt4 t)))
 
         (dotimes (i puzz_size)
             (prt_row (nth i puzz1) prt1) ; need to print spacing and arrow

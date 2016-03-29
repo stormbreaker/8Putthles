@@ -1,5 +1,3 @@
-;(defun readlist(fstream ))
-
 #|
 Author: John M. Weiss, Ph.D.
 Posted Spring 2016 for SDSM&T CSC447/547 Artificial Intelligence.

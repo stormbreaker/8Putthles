@@ -63,7 +63,9 @@ Added aStar method - this caused the overall function to require a
     (let (solution)
         (do*                                                    ; note use of sequential DO*
             (                                                   ; initialize local loop vars
-                (curNode (make-node :state start :parent nil :heuristic (funcall heuristicVal start) :depth 0 ))  ; current node: (start nil)
+                (curNode (make-node :state start :parent nil 
+                                    :heuristic (funcall heuristicVal start) 
+                                    :depth 0 ))  ; current node: (start nil)
                 (OPEN (list curNode))                           ; OPEN list:    ((start nil))
                 (CLOSED nil)                                    ; CLOSED list:  ( )
             )
@@ -74,22 +76,28 @@ Added aStar method - this caused the overall function to require a
             ; loop body
             (when (null OPEN) (return nil))             ; no solution
 
-            (if (eq type 'aStar) (format t "OPEN: before sort ~s~%" OPEN) )
             ;This is where the sort must happen for aStar
             (if (eq type 'aStar) (sort OPEN #'< :key #'node-heuristic))
-            
-            (if (eq type 'aStar) (format t "OPEN: before sort ~s~%" OPEN) )
             
             ; get current node from OPEN, update OPEN and CLOSED
             (setf curNode (car OPEN))
             (setf OPEN (cdr OPEN))
             (setf CLOSED (cons curNode CLOSED))
+            
+            (incf *nodesExpanded* 1) ;Global count of nodes expanded
+                  ;this variable requires outside sources to reset
 
             ; add successors of current node to OPEN
             (dolist (child (generate-successors (node-state curNode)))
 
                 ; for each child node
-                (setf child (make-node :state child :parent (node-state curNode) :heuristic (+ (+ 1 ( node-depth curNode )) (funcall heuristicVal (node-state curNode))) :depth (+ 1 ( node-depth curNode ))))
+                (setf child (make-node :state child 
+                                       :parent (node-state curNode) 
+                                       :heuristic (+ (+ 1 ( node-depth curNode )) (funcall heuristicVal (node-state curNode))) 
+                                       :depth (+ 1 ( node-depth curNode ))))
+                
+                (incf *nodesGenerated* 1) ;Global count of nodes generated
+                  ;this variable requires outside sources to reset
 
                 ; if the node is not on OPEN or CLOSED
                 (if (and (not (member child OPEN   :test #'equal-states))
@@ -129,11 +137,9 @@ Added aStar method - this caused the overall function to require a
 
         ; find the parent of the current node
         (setf node (member-state (node-parent node) node-list))
-        (format t "node after setf = ~s~%" node)
 
         ; add it to the path
         (setf path (cons (node-state node) path))
-        (format t "path after setf = ~s~%" path)
         path
     )
 )

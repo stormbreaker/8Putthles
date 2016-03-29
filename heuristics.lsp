@@ -13,7 +13,6 @@ Return:
 (defun tileDistance (loc puzzle) ;should this get passed in a goal state as well?
 	(let (valueToTest)
 		(setf valueToTest (nth (cadr loc) (nth (car loc) puzzle)))
-(format t "testing value ~S at [~S , ~S]~%" valueToTest (car loc) (cadr loc))
 		(cond
 			((= valueToTest 1) (+ (abs (- (cadr loc) 0)) (abs (- (car loc) 0))))
 			((= valueToTest 2) (+ (abs (- (cadr loc) 1)) (abs (- (car loc) 0))))
@@ -53,7 +52,6 @@ Sam.  Broke as said in FB message
 				(push rowI loc)
 				;call the helper function on this location
 				(setf sum (+ sum (tileDistance loc puzzle))) ;This line may be a little off
-				(format t "For location ~S we have ~S~%" loc (tileDistance loc puzzle))
 				;move to the next column
 				(incf colI)
 			)

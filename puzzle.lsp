@@ -90,7 +90,6 @@ Return: nothing specific, don't use the return value for this function
          (setf *nodesExpanded* 0)
          (setf outPut (aStar puzzleList #'nilsson ));return OutputList
          (format t "A* Nilsson's Sequence Score search:~%")
-         (printScreen outPut)
          (format t "~s~%" outPut)
          (format t "Number of moves required: ~s~%" (list-length output))
          (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)

@@ -6,6 +6,15 @@
 (defvar *nodesGenerated*);includes generated duplicates that did not get added into the open list
 (defvar *nodesExpanded*)
 
+
+#|
+Name: 8puzzle
+Author: Johnathan Ackerman (but really everyone because i'm using their functions)
+Description:  This function displays a path and data about 5 different search routines run on
+the toy 8 puzzle.
+Parameters: optional filename - pass a puzzle by file
+Return: nothing specific, don't use the return value for this function
+|#
 (defun 8puzzle  
     (
      &optional puzzleFile 
@@ -92,6 +101,14 @@
 #|----------------------------------------------------|#
 
 ;generates successors from the current state - should work for all versions
+#|
+Name: generate-successors
+Author: Johnathan Ackerman 
+Description:  This function generates all possible successors for the
+given 8 puzzle state.
+Parameters: state - state of the 8 puzzle
+Return: successor-list - list of all successors
+|#
 (defun generate-successors (state)
     (let    (
              ( sublistCounter 0 )
@@ -176,6 +193,16 @@
 )
     
 ;swaps two points in a 2d list based on boolean values and a position
+#|
+Name: swapPoints
+Author: Johnathan Ackerman
+Description:  swaps two points in a 2d list based on boolean values and a position
+Parameters: state - current 8 puzzle state
+            curPosition - position in state being swapped
+            right-left - -1 move curPosition left +1 move right 0. don't move
+            up-down - -1 move curPosition down +1 move up 0. don't move
+Return: new state based on swap
+|#
 (defun swapPoints (state curPosition right-left up-down)
     (let ((tempState ()))
          (dolist (subList state)
@@ -204,6 +231,14 @@
 
 ;admissable
 ;heuristic that checks if each position has the right value
+#|
+Name: simpleHeuristic
+Author: Johnathan Ackerman
+Description:  Misplaced Tile Heuristic - checks if a given
+position is currect
+Parameters: state - current 8 puzzle state
+Return: count - Heuristic generated value
+|#
 (defun simpleHeuristic (state)
     (let (
             (count 0)
@@ -227,6 +262,13 @@
 )
 
 ;generates the goal state
+#|
+Name: generateGoalState
+Author: Johnathan Ackerman
+Description:  generates an answer key
+Parameters: length - length of sublist
+Return: goal-state
+|#
 (defun generateGoalState ( length )
 
     ;use length to generalize
@@ -238,6 +280,16 @@
 
 ;inadmissable
 ;checks if the spots around each spot is correct
+#|
+Name: nilsson
+Author: Johnathan Ackerman
+Description:  Nilsson's Sequence update - checks
+the positions around each spot in the puzzle, for 
+each that is wrong add 2. If the 0 place is wrong
+add 1.
+Parameters: state - current 8 puzzle state
+Return: count - Heuristic generated value
+|#
 (defun nilsson (state)
     (let (
             (count 0)

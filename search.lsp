@@ -32,7 +32,7 @@ made local variable solution so that the solution was forced to be
 ;--------------------------------------------------------------------------
 
 ; Node structure: stores state and parent.
-(defstruct node state parent)
+(defstruct node state parent heuristic depth)
 
 ; Test if two nodes have the same state.
 (defun equal-states (n1 n2) (equal (node-state n1) (node-state n2)))
@@ -40,17 +40,24 @@ made local variable solution so that the solution was forced to be
 ;--------------------------------------------------------------------------
 
 ; Breadth-first-search implements the OPEN list as a QUEUE of (state parent) nodes.
-(defun bfs (start) (search_bfs_dfs start 'bfs))
+(defun bfs (start) (search_bfs_dfs start 'bfs #'(lambda (state) 0)))
 
 ; Depth-first-search implements the OPEN list as a STACK of (state parent) nodes.
-(defun dfs (start) (search_bfs_dfs start 'dfs))
+(defun dfs (start) (search_bfs_dfs start 'dfs #'(lambda (state) 0)))
+
+; A* search, sorts the OPEN list based on heurist value
+(defun aStar (start heuristic) (search_bfs_dfs start 'aStar heuristic))
 
 ; Given a start state and a search type (BFS or DFS), return a path from the start to the goal.
-(defun search_bfs_dfs (start type)
+(defun search_bfs_dfs 
+    (
+     start type
+     heuristicVal   
+    )
     (let (solution)
         (do*                                                    ; note use of sequential DO*
             (                                                   ; initialize local loop vars
-                (curNode (make-node :state start :parent nil))  ; current node: (start nil)
+                (curNode (make-node :state start :parent nil :heuristic (funcall heuristicVal start) :depth 0 ))  ; current node: (start nil)
                 (OPEN (list curNode))                           ; OPEN list:    ((start nil))
                 (CLOSED nil)                                    ; CLOSED list:  ( )
             )
@@ -61,6 +68,12 @@ made local variable solution so that the solution was forced to be
             ; loop body
             (when (null OPEN) (return nil))             ; no solution
 
+            (if (eq type 'aStar) (format t "OPEN: before sort ~s~%" OPEN) )
+            ;This is where the sort must happen for aStar
+            (if (eq type 'aStar) (sort OPEN #'< :key #'node-heuristic))
+            
+            (if (eq type 'aStar) (format t "OPEN: before sort ~s~%" OPEN) )
+            
             ; get current node from OPEN, update OPEN and CLOSED
             (setf curNode (car OPEN))
             (setf OPEN (cdr OPEN))
@@ -70,7 +83,7 @@ made local variable solution so that the solution was forced to be
             (dolist (child (generate-successors (node-state curNode)))
 
                 ; for each child node
-                (setf child (make-node :state child :parent (node-state curNode)))
+                (setf child (make-node :state child :parent (node-state curNode) :heuristic (+ (+ 1 ( node-depth curNode )) (funcall heuristicVal (node-state curNode))) :depth (+ 1 ( node-depth curNode ))))
 
                 ; if the node is not on OPEN or CLOSED
                 (if (and (not (member child OPEN   :test #'equal-states))
@@ -86,6 +99,7 @@ made local variable solution so that the solution was forced to be
                         ((eq type 'dfs) (setf OPEN (cons child OPEN)))
                         
                         ; A*  - add to end of open list and sort after
+                        ((eq type 'aStar) (setf OPEN (append OPEN (list child))))
 
                         ; error handling for incorrect usage
                         (t (format t "SEARCH: bad search type! ~s~%" type) (return nil))
@@ -126,7 +140,7 @@ made local variable solution so that the solution was forced to be
 )
 
 ;------------------------------------------------------------------------------
-;needed functions
+;needed functions and added functions
 ;------------------------------------------------------------------------------
 ;returns true if goal state <- version only works on basic puzzle
 ;returns true if goal state <- version only works on basic puzzle
@@ -135,4 +149,9 @@ made local variable solution so that the solution was forced to be
     (if (null (equal (cadr state) '(8 0 4))) (return-from goal-state nil))
     (if (null (equal (caddr state) '(7 6 5))) (return-from goal-state nil))
     t
+)
+
+;returns 0
+(defun zero ()
+    0
 )

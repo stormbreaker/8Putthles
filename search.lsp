@@ -150,14 +150,3 @@ Added aStar method - this caused the overall function to require a
         (when (equal state (node-state node)) (return node))
     )
 )
-
-;------------------------------------------------------------------------------
-;needed functions and added functions
-;------------------------------------------------------------------------------
-;returns true if goal state <- version only works on basic puzzle
-(defun goal-state (state)
-    (if (null (equal (car state) '(1 2 3))) (return-from goal-state nil))
-    (if (null (equal (cadr state) '(8 0 4))) (return-from goal-state nil))
-    (if (null (equal (caddr state) '(7 6 5))) (return-from goal-state nil))
-    t
-)

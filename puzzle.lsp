@@ -1,5 +1,6 @@
 ;Load in Dr. Weiss's search code
 (load 'search.lsp)
+(load 'searchFunctions.lsp)
 (load 'read.lsp)
 (load 'heuristics.lsp)
 

@@ -123,10 +123,6 @@ Description: This function
 Parameters:
 Return: 
 |#
-#|
-Sam.  Broke as said in FB message
-
-|#
 (defun calcManhattan (puzzle)
 	(let ((sum 0) (colI 0) (rowI 0) (loc))
 		;loop through the rows (sublists)

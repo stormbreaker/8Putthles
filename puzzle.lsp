@@ -8,76 +8,30 @@
      puzzleFile  
      &optional puzzleSize
     )
-    (let ((defvar 'puzzleList '((1 3 4)(8 6 2)(7 0 5)))) ;set puzzel list to easy puzzle as default
+    (let ((puzzleList '((1 3 4)(8 6 2)(7 0 5)))) ;set puzzel list to easy puzzle as default
          ;check if size is Valid
          ;read in puzzleFile into puzzle list
          ;check if solvable <- he does give us a solvable function
          
          ;BreathFirstSearch
-         (customSearch    puzzleList  BFS Null );return OutputList
+         (bfs puzzleList);return OutputList
          (PrintScreen OutputList)
          
          ;DepthFirstIteratedDepeningSearch
-         (customSearch    puzzleList  DFID    Null );return OutputList
+         (dfs puzzleList);return OutputList
          (printScreen OutputList)
          
          ;A* admissible #1
-         (customSearch    puzzleList  bestFirst   admissibleHeuristic1 );return OutputList
+         (aStar puzzleList #'simpleHeuristic );return OutputList
          (printScreen OutputList)
          
          ;A* admissible #2
-         (customSearch    puzzleList  bestFirst   admissibleHeuristic2 );return OutputList
+         ;(aStar puzzleList #'admissibleHeuristic2 );return OutputList
          (printScreen OutputList)
          
          ;A* inadmissible
-         (customSearch    puzzleList  bestFirst   inAdmissibleHeuristic1 );return OutputList
+         (aStar puzzleList #'nilsson );return OutputList
          (printScreen OutputList)
-    )
-)
-
-(defun customSearch   
-    (
-     'puzzleList  
-     algorithm   
-     Heuristic
-    )
-    (let    ((defvar 'answerList))
-            ;(if Heuristic /= null)
-                (algorithm  'puzzleList  Heuristic);return answerList
-            ;else
-                (algorithm  'puzzleList);return answerList
-            
-            (prepForDisplay 'answerList);return this ; this could all be done in printScreen
-            
-    )
-)
-
-(defun bestFirst    'puzzleList  heuristic
-    (let    ((defvar 'answerList))
-
-            ; sudo code for a* from Weiss's website
-#|
-            BestFS( node ) // A* algorithm
-            {
-            Add( node, open );
-            repeat
-            node = Best( open );
-            move node from open list to closed list;
-            if Goal( node ) then return SUCCESS;
-            for each child in Successors( node ) do
-            if child is not on open or closed lists then
-            Add( child, open );
-            else if child is on open list then
-            update F’( node ) and Parent( node );
-            else if child is on closed list then
-            update F’( node ) and Parent( node ) and either
-            a) move node from closed to open;
-            - OR -
-            b) update descendants of node on open and closed;
-            until Empty( open );
-            return FAILURE;
-            }
-|#
     )
 )
 
@@ -181,6 +135,7 @@
     )
 )
     
+;swaps two points in a 2d list based on boolean values and a position
 (defun swapPoints (state curPosition right-left up-down)
     (let ((tempState ()))
          (dolist (subList state)
@@ -205,7 +160,10 @@
 )
 
 ;Heuristics and helper function
+#|*******************************************|#
 
+;admissable
+;heuristic that checks if each position has the right value
 (defun simpleHeuristic (state)
     (let (
             (count 0)
@@ -228,6 +186,7 @@
     )
 )
 
+;generates the goal state
 (defun generateGoalState ( length )
 
     ;use length to generalize
@@ -237,6 +196,8 @@
 
 )
 
+;inadmissable
+;checks if the spots around each spot is correct
 (defun nilsson (state)
     (let (
             (count 0)

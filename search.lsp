@@ -24,6 +24,12 @@ had to fix the termination condition so that the do loop would even run
     (repeated error of GOAL-STATE not visilbe for RETURN-FROM)
 made local variable solution so that the solution was forced to be
     the last thing evaluated
+Added aStar method - this caused the overall function to require a 
+    heuristic function to generate values for each state. Any function
+    can be passed into bfs and dfs because they do not use the 
+    heuristic value - the aStar value does sort the open list based
+    on the heuristic value before it expends another node from the open
+    list.
 
 |#
 
@@ -143,15 +149,9 @@ made local variable solution so that the solution was forced to be
 ;needed functions and added functions
 ;------------------------------------------------------------------------------
 ;returns true if goal state <- version only works on basic puzzle
-;returns true if goal state <- version only works on basic puzzle
 (defun goal-state (state)
     (if (null (equal (car state) '(1 2 3))) (return-from goal-state nil))
     (if (null (equal (cadr state) '(8 0 4))) (return-from goal-state nil))
     (if (null (equal (caddr state) '(7 6 5))) (return-from goal-state nil))
     t
-)
-
-;returns 0
-(defun zero ()
-    0
 )

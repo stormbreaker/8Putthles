@@ -8,47 +8,30 @@
      puzzleFile  
      &optional puzzleSize
     )
-    (let ((defvar 'puzzleList '((1 3 4)(8 6 2)(7 0 5)))) ;set puzzel list to easy puzzle as default
+    (let ((puzzleList '((1 3 4)(8 6 2)(7 0 5)))) ;set puzzel list to easy puzzle as default
          ;check if size is Valid
          ;read in puzzleFile into puzzle list
          ;check if solvable <- he does give us a solvable function
          
          ;BreathFirstSearch
-         (customSearch    puzzleList  BFS Null );return OutputList
+         (bfs puzzleList);return OutputList
          (PrintScreen OutputList)
          
          ;DepthFirstIteratedDepeningSearch
-         (customSearch    puzzleList  DFID    Null );return OutputList
+         (dfs puzzleList);return OutputList
          (printScreen OutputList)
          
          ;A* admissible #1
-         (customSearch    puzzleList  bestFirst   admissibleHeuristic1 );return OutputList
+         (aStar puzzleList #'simpleHeuristic );return OutputList
          (printScreen OutputList)
          
          ;A* admissible #2
-         (customSearch    puzzleList  bestFirst   admissibleHeuristic2 );return OutputList
+         ;(aStar puzzleList #'admissibleHeuristic2 );return OutputList
          (printScreen OutputList)
          
          ;A* inadmissible
-         (customSearch    puzzleList  bestFirst   inAdmissibleHeuristic1 );return OutputList
+         (aStar puzzleList #'nilsson );return OutputList
          (printScreen OutputList)
-    )
-)
-
-(defun customSearch   
-    (
-     'puzzleList  
-     algorithm   
-     Heuristic
-    )
-    (let    ((defvar 'answerList))
-            ;(if Heuristic /= null)
-                (algorithm  'puzzleList  Heuristic);return answerList
-            ;else
-                (algorithm  'puzzleList);return answerList
-            
-            (prepForDisplay 'answerList);return this ; this could all be done in printScreen
-            
     )
 )
 

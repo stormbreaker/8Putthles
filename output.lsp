@@ -7,14 +7,46 @@ Date March 2016
 |#
 
 ; Output the final solution path, move by move
-(defun prt_sol (puzzle moves)
-    "(prt_sol puzzle moves): will take the inital puzzle and following moves
-    print the solution path"
+(defun prt_sol (sol)
+    "(prt_sol sol): will take the solution path and print it"
     ;TODO find where the empty spot is, and follow the moves, actually all of this
+    (let ((sol_len) (puzz_size) (arr_loc) (to_prt))
 
-    (format t "~A~%" (car puzzle))
-    (format t "~A~%" (cadr puzzle))
-    (format t "~A~%" (cdr puzzle))
+    (setf sol_len (list-length sol)) ; find how many puzzles we need to print
+    (setf puzz_size (list-length (car sol))) ; get number of rows in puzzle
+    (setf arr_loc (floor puzz_size 2)) ; arrow location is at half the rows
+    (setf to_prt sol) ; copy the solution set, so we can print down the line
+
+    (do ((num_prt 0 (setf num_prt (+ num_prt 4))) ((puzz1) () ()) ((puzz2) () ())
+        ((puzz3) () ()) ((puzz4) () ()) (prt1) (prt2) (prt3) (prt4))
+        ((> 0 (- sol_len num_prt)) T)
+
+        ; check if we've hit the null point if so don't set
+        (cond 
+            ((null (car to_prt)) (setf prt1 nil))
+            (t ((setf puzz1 (car to_prt)) (setf prt1 t))))
+        (if (not (null (nth 1 to_prt)))
+            ((setf puzz2 (nth 1 to_prt)) (setf prt2 t))
+            (setf prt2 nil))
+        (if (not (null (nth 2 to_prt)))
+            ((setf puzz3 (nth 2 to_prt)) (setf prt3 t))
+            (setf prt3 nil))
+        (if (not (null (nth 3 to_prt)))
+            ((setf puzz4 (nth 3 to_prt)) (setf prt4 t))
+            (setf prt4 nil))
+
+        (dotimes (i puzz_size)
+            (prt_row (nth i puzz1) prt1) ; need to print spacing and arrow
+            (prt_row (nth i puzz2) prt2)
+            (prt_row (nth i puzz3) prt3)
+            (prt_row (nth i puzz4) prt4)
+        )
+        ; enter a loop to print each row of the puzzle indicate if we should
+        ; print that puzzle
+
+        (setf to_prt (cddddr to_prt)) ; get rid of first four puzzles in lst
+    )
+    ) ; end of let
 )
 
 ; output the formatted puzzle
@@ -28,11 +60,15 @@ Date March 2016
 )
 
 ; prints a specific row of the puzzle
-(defun prt_row (row)
+(defun prt_row (row prt_row)
     "(prt_row row) prints a row of n elements for a tile puzzle"
     (cond
-        ((null (cdr row)) (prt_elem (car row) t))
-        (t (prt_elem (car row) nil) (prt_row (cdr row)))
+        ((null prt_row) nil)
+        (t (cond
+            ((null (cdr row)) (prt_elem (car row) nil))
+            (t (prt_elem (car row) nil) (prt_row (cdr row)))
+           )
+        )
     )
 )
 

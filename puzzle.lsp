@@ -87,10 +87,6 @@
     )
 )
 
-
-;Will also need three different heuristic functions
-
-
 ;Functions needed for weiss's search algorithms
 #|----------------------------------------------------|#
 
@@ -190,43 +186,25 @@
          (dolist (subList state)
              (setf tempState (append tempState (list (copy-list subList))))
          )
-         (format t "curPosition = ~S~%" curPosition)
-         (format t "right-left = ~S~%" right-left)
-         (format t "up-down = ~S~%" up-down)
          (cond
              ((= right-left 1) ;swap right
-              (format t "swap right curPosition = ~S~%" curPosition)
-              (format t "car curPosition = ~S~%" (car curPosition) )
-              (format t "cadr curPosition = ~S~%" (cadr curPosition) )
                 (rotatef ( nth (car curPosition) ( nth (cadr curPosition) tempState)) ( nth (+ 1 (car curPosition) ) ( nth (cadr curPosition) tempState)) )
-                (format t "tempState = ~S~%" tempState)
              )
              ((= right-left -1) ;swap left
-                (format t "swap left curPosition = ~S~%" curPosition)
-                (format t "car curPosition = ~S~%" (car curPosition) )
-                (format t "cadr curPosition = ~S~%" (cadr curPosition) )
                 (rotatef ( nth (car curPosition) ( nth (cadr curPosition) tempState)) ( nth (- (car curPosition) 1 ) ( nth (cadr curPosition) tempState)) )
-                (format t "tempState = ~S~%" tempState)
               )
              ((= up-down 1) ;swap up
-                (format t "swap up curPosition = ~S~%" curPosition)
-                (format t "car curPosition = ~S~%" (car curPosition) )
-                (format t "cadr curPosition = ~S~%" (cadr curPosition) )
-                (format t "before tempState = ~S~%" tempState)
                 (rotatef ( nth (car curPosition) ( nth (cadr curPosition) tempState)) ( nth (car curPosition) (nth (- (cadr curPosition) 1) tempState)) )
-                (format t "after tempState = ~S~%" tempState)
               )
              ((= up-down -1) ;swap down
-                (format t "swap down curPosition = ~S~%" curPosition)
-                (format t "car curPosition = ~S~%" (car curPosition) )
-                (format t "cadr curPosition = ~S~%" (cadr curPosition) )
                 (rotatef ( nth (car curPosition) ( nth (cadr curPosition) tempState)) ( nth (car curPosition) (nth (+ (cadr curPosition) 1) tempState)) )
-                (format t "tempState = ~S~%" tempState)
              )
         )
         tempstate
     )
 )
+
+;Heuristics and helper function
 
 (defun simpleHeuristic (state)
     (let (
@@ -257,4 +235,72 @@
     ;currently just 8Puzzle though
     '((1 2 3)(8 0 4)(7 6 5)) ;return solution
 
+)
+
+(defun nilsson (state)
+    (let (
+            (count 0)
+            (elementCounter 0) (sublistCounter 0)
+            (curPosition '(0 0))
+            goalState
+        )
+
+        ;set goalState
+        (setf goalState (generateGoalState (list-length state)))
+        
+        ;find 0 in goalState
+        (block search-for-0 ;pointer to break from loop
+            (dolist (sublist goalState) ;2d list
+                (setf elementCounter 0) ;reset x value
+                (dolist (element sublist)
+                    (if (= element 0) (return-from search-for-0)
+                    (incf elementCounter)) ; increment x-value
+                )
+                (incf sublistCounter) ;increment y-value
+            )
+        )
+
+        (setf sublistCounter 0)
+        (dolist (sublist state) ;2d list
+            (setf elementCounter 0) ;reset x value
+            (dolist (element sublist)
+                ;check top
+                (if (and (/= sublistCounter 0) 
+                    (/= ( nth elementCounter ( nth (- sublistCounter 1) state)) 
+                        ( nth elementCounter ( nth (- sublistCounter 1) goalState))))
+                    (incf count 2); increment count
+                )
+                
+                ;check bottom
+                (if (and (/= sublistCounter (- (list-length state) 1 ))
+                    (/= ( nth elementCounter ( nth (+ sublistCounter 1) state)) 
+                        ( nth elementCounter ( nth (+ sublistCounter 1) goalState))))
+                    (incf count 2); increment count
+                )
+                
+                ;check left
+                (if (and (/= elementCounter 0)
+                    (/= ( nth (- elementCounter 1) ( nth sublistCounter state)) 
+                        ( nth (- elementCounter 1) ( nth sublistCounter goalState))))
+                    (incf count 2)
+                )
+                
+                ;check right
+                (if (and (/= elementCounter (- ( list-length state) 1 ))
+                    (/= ( nth (+ elementCounter 1) ( nth sublistCounter state)) 
+                        ( nth (+ elementCounter 1) ( nth sublistCounter goalState))))
+                    (incf count 2)
+                )
+                
+                (incf elementCounter) ;increment x-value
+            )
+            (incf sublistCounter) ;increment y-value
+        )
+        
+        ;check 0
+        (if (= ( nth (car curPosition) ( nth (cadr curPosition) state)) ( nth (car curPosition) ( nth (cadr curPosition) goalState)))
+            (incf count 1)) ; increment x-value
+
+        count
+    )
 )

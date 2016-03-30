@@ -37,6 +37,9 @@ Parameters: N/A
 Return: a list of the values which were input by the user.  -1 terminates the list and is not included in the list
 |#
 (defun userinput()
+        (format t "Enter a series of numbers between 0 and 8, with spaces")
+        (format t " between any two numbers when complete enter -1~%")
+        (format t "E.G. 1 2 3 8 0 4 7 6 5~%-1~%")
 	(let (temp temppuzzle)
 		(do ((data (read) (read)))
 			((equal data -1) (return-from userinput (reverse temppuzzle)))

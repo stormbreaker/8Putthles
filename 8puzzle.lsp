@@ -16,6 +16,14 @@ once it is loaded
     (8puzzle '<filename>)
 
 The <> signifies optional
+
+
+PLEASE NOTE
+-bfs and DFS are both increadibly slow on the tougher files
+    They will take a long time to complete on anything tougher
+    than medium. They are unbarably long on the tough puzzle.
+-The tough puzzle takes a very long time on all algorithms, but
+    the a* algorithms are significantly faster.
 |#
 
 

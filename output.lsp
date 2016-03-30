@@ -82,7 +82,7 @@ Date March 2016
     "(prt_elem elem end_row size) prints an element of a puzzles row, unless blank"
     (cond
         ((equal '0 elem)
-         (if (> 3 size) (format t "   ")
+         (if (> size 3) (format t "  ")
              (format t "  ")))
         (t (format t "~2D" elem))
     )

@@ -7,6 +7,13 @@ Date March 2016
 |#
 
 ; Output the final solution path, move by move
+#|
+Name: prt_sol
+Author: Samuel Carroll
+Description:  Output the final solution path, move by move
+Parameters: sol - solution
+Return: N/A
+|#
 (defun prt_sol (sol)
     "(prt_sol sol): will take the solution path and print it"
 
@@ -65,6 +72,14 @@ Date March 2016
 )|#
 
 ; prints a specific row of the puzzle
+#|
+Name: prt_sol
+Author: Samuel Carroll
+Description:  prints a specific row of the puzzle
+Parameters: row - given row from state
+            prt_row - this function
+Return: N/A
+|#
 (defun prt_row (row prt_row)
     "(prt_row row) prints a row of n elements for a tile puzzle if indicated"
     (cond
@@ -78,6 +93,15 @@ Date March 2016
 )
 
 ; prints a single element of the puzzle
+#|
+Name: prt_elem
+Author: Samuel Carroll
+Description:  prints a specific element in the puzzle
+Parameters: elem - given element from state
+            end_row - predicate to see if at end of row
+            size    - size of row
+Return: N/A
+|#
 (defun prt_elem (elem end_row size)
     "(prt_elem elem end_row size) prints an element of a puzzles row, unless blank"
     (cond
@@ -95,6 +119,16 @@ Date March 2016
 
 ; use row arrow location and if we have another value
 ; prints the seperators between rows of puzzles
+#|
+Name: prt_spc
+Author: Samuel Carroll
+Description:  use row arrow location and if we have another value and
+    prints the seperators between rows of puzzles
+Parameters: row_num - which row its on
+            arr_loc - location in the array
+            tail_val    - predicate for end of row
+Return: N/A
+|#
 (defun prt_spc (row_num arr_loc tail_val)
     "(prt_spc row_num arr_loc tail_val ) 
      print spaces between rows and arrow as needed (i.e. another value"

@@ -119,7 +119,7 @@ Return: count - Heuristic generated value
 #|
 Name: calcManhattan
 Author: Benjamin Kaiser
-Description: This function 
+Description: This function is the calling function that calculates the sum of the Manhattan distances for a given puzzle.  This is one of the admissable heuristics. 
 Parameters: puzzle: This is a puzzle state as a list
 Return: This returns a sum value of all the Manhattan distances
 |#
@@ -156,13 +156,8 @@ Name: tileDistance
 Author: Benjamin Kaiser
 Description: This function returns distance from where its suppose to be for 8-puzzle
 Parameters: loc is a list of length 2 which contians the x and y
-Return: 
+Return: scalar value indicating the Manhattan distance of an individual tile.
 |#
-
-;;theoretically cars give rows and cadrs give column
-
-;;;What I don't like about this is that it is hard-coded to an 8 puzzle 
-
 (defun tileDistance (loc puzzle) ;should this get passed in a goal state as well?
 	(let (valueToTest)
 		(setf valueToTest (nth (cadr loc) (nth (car loc) puzzle)))
@@ -185,7 +180,7 @@ Name: generalTileDistance
 Author: Benjamin Kaiser
 Description: This function returns distance from where its suppose to be for n-puzzle
 Parameters: loc is a list of length 2 which contians the x and y
-Return: 
+Return: a scalar value indicating the Manhattan distance of an individual tile.  
 |#
 (defun generalTileDistance (loc puzzle size)
 	(let (valueToTest (returnVal 0))

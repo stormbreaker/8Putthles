@@ -9,7 +9,7 @@ Date March 2016
 ; Output the final solution path, move by move
 (defun prt_sol (sol)
     "(prt_sol sol): will take the solution path and print it"
-    ;TODO find where the empty spot is, and follow the moves, actually all of this
+
     (let ((sol_len) (puzz_size) (arr_loc) (to_prt))
 
     (setf sol_len (list-length sol)) ; find how many puzzles we need to print

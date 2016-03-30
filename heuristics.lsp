@@ -120,8 +120,8 @@ Return: count - Heuristic generated value
 Name: calcManhattan
 Author: Benjamin Kaiser
 Description: This function 
-Parameters:
-Return: 
+Parameters: puzzle: This is a puzzle state as a list
+Return: This returns a sum value of all the Manhattan distances
 |#
 (defun calcManhattan (puzzle)
 	(let ((sum 0) (colI 0) (rowI 0) (loc))

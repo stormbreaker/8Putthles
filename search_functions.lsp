@@ -3,10 +3,12 @@
 ;------------------------------------------------------------------------------
 ;returns true if goal state <- version only works on basic puzzle
 (defun goal-state (state)
-    (if (null (equal (car state) '(1 2 3))) (return-from goal-state nil))
-    (if (null (equal (cadr state) '(8 0 4))) (return-from goal-state nil))
-    (if (null (equal (caddr state) '(7 6 5))) (return-from goal-state nil))
+    (let ((goal (genGoal (list-length state))))
+         (dolist (sublist state)
+             (if (not (equal sublist (nth (position sublist state) goal))) (return-from goal-state nil))
+         )
     t
+    )
 )
 
 ;Functions needed for weiss's search algorithms

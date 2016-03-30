@@ -19,7 +19,7 @@ Return: count - Heuristic generated value
         )
 
         ;set goalState
-        (setf goalState (generateGoalState (list-length state)))
+        (setf goalState (genGoal (list-length state)))
 
         (dolist (sublist state) ;2d list
             (setf elementCounter 0) ;reset x value
@@ -57,7 +57,7 @@ Return: count - Heuristic generated value
         )
 
         ;set goalState
-        (setf goalState (generateGoalState (list-length state)))
+        (setf goalState (genGoal (list-length state)))
         
         ;find 0 in goalState
         (block search-for-0 ;pointer to break from loop
@@ -123,10 +123,6 @@ Description: This function
 Parameters:
 Return: 
 |#
-#|
-Sam.  Broke as said in FB message
-
-|#
 (defun calcManhattan (puzzle)
 	(let ((sum 0) (colI 0) (rowI 0) (loc))
 		;loop through the rows (sublists)
@@ -140,8 +136,9 @@ Sam.  Broke as said in FB message
 				;find out which row we're in and put in loc
 				(push rowI loc)
 				;call the helper function on this location
-				(setf sum (+ sum (tileDistance loc puzzle))) ;This line may be a little off
+				(setf sum (+ sum (generalTileDistance loc puzzle (length puzzle)))) ;This line may be a little off
 				;move to the next column
+				;(break)
 				(incf colI)
 			)
 			(setf colI 0)
@@ -180,6 +177,22 @@ Return:
 			((= valueToTest 8) (+ (abs (- (cadr loc) 0)) (abs (- (car loc) 1))))
 			(t 0)
 		)
+	)
+)
+
+(defun generalTileDistance (loc puzzle size)
+	(let (valueToTest (returnVal 0))
+		(setf valueToTest (nth (cadr loc) (nth (car loc) puzzle)))
+		;(break)
+		(cond
+			((= size 3) (tileDistance loc puzzle))
+			(
+				(not (= valueToTest 0))
+				(setf returnVal (+ (abs (- (cadr loc) (rem valueToTest size))) (abs (- (car loc) (/ (- valueToTest (rem valueToTest size)) size)))))
+			)
+			(t 0)
+		)
+		returnVal
 	)
 )
 

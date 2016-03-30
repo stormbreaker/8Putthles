@@ -158,8 +158,6 @@ Added aStar method - this caused the overall function to require a
                 )
             )
         )
-        (format t "MaxDepth = ~s~%" maxDepth)
-         (format t "MaxDepth = ~s~%" (node-depth (car CLOSED)))
         (if (and (eq type 'dfsID) (not solution) dfsIDHitEnd)
             (setf solution 
                 (search_bfs_dfs start 'dfsID 

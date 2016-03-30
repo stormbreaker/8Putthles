@@ -68,7 +68,7 @@ Return: nothing specific, don't use the return value for this function
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
          (format t "~%~%DFS itterated deepening search: (May take a while)~%")
-         ;(setf outPut (dfsID puzzleList));return OutputList
+         (setf outPut (dfsID puzzleList));return OutputList
          (printSolutionBlock outPut)
          
          ;BreathFirstSearch

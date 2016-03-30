@@ -67,7 +67,7 @@ Added aStar method - this caused the overall function to require a
      start type
      heuristicVal 
     )
-    (let (solution maxDepth (CLOSED nil))
+    (let (solution maxDepth (CLOSED nil) (dfsIDHitEnd nil))
          (if (eq type 'dfsID)(setf maxDepth (funcall heuristicVal 0))) ;uses the heuristic function to pass max depth - only used in dfsID
          ( block sequential-DO* 
             (do*                                                    ; note use of sequential DO*
@@ -108,8 +108,30 @@ Added aStar method - this caused the overall function to require a
                       ;this variable requires outside sources to reset
 
                     ; if the node is not on OPEN or CLOSED
-                    (if (and (not (member child OPEN   :test #'equal-states))
-                             (not (member child CLOSED :test #'equal-states)))
+                    (if (or (
+                              and (not (member child OPEN   :test #'equal-states))
+                                  (not (member child CLOSED :test #'equal-states))
+                             )
+                             (
+                              or  (cond 
+                                      ((and (member child OPEN   :test #'equal-states) 
+                                           (< (node-depth child) 
+                                              (node-depth (nth (position child OPEN   :test #'equal-states) OPEN))))
+                                                (setf OPEN (remove (position child OPEN   :test #'equal-states) OPEN))
+                                                t
+                                      )
+                                      
+                                      ((and (member child CLOSED   :test #'equal-states) 
+                                           (< (node-depth child) 
+                                              (node-depth (nth (position child CLOSED   :test #'equal-states) CLOSED))))
+                                                (setf CLOSED (remove (position child CLOSED   :test #'equal-states) CLOSED))
+                                                t
+                                      )
+                                       
+                                       (t nil)
+                                      )
+                                  )
+                             )
 
                         ; add it to the OPEN list
                         (cond
@@ -120,6 +142,7 @@ Added aStar method - this caused the overall function to require a
                             ; if at max depth add to close list
                             ((and (eq type 'dfsID) (= (node-depth child) maxDepth)) 
                              (setf CLOSED (cons child CLOSED))
+                             (setf dfsIDHitEnd T)
                             )
                             
                             ; DFS - add to start of OPEN list (stack)
@@ -135,7 +158,9 @@ Added aStar method - this caused the overall function to require a
                 )
             )
         )
-        (if (and (eq type 'dfsID) (not solution) (= (node-depth (car CLOSED)) maxDepth))
+        (format t "MaxDepth = ~s~%" maxDepth)
+         (format t "MaxDepth = ~s~%" (node-depth (car CLOSED)))
+        (if (and (eq type 'dfsID) (not solution) dfsIDHitEnd)
             (setf solution 
                 (search_bfs_dfs start 'dfsID 
                                #'(lambda (state) (+ 1 maxDepth))

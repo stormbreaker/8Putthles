@@ -84,8 +84,18 @@ Return: nothing specific, don't use the return value for this function
     )
 )
 
+#|
+Name: printSolutionBlock
+Author: Johnathan Ackerman (but really everyone because i'm using their functions)
+Description:  This function displays a path and data about 5 different search routines run on
+the toy 8 puzzle.
+Parameters: optional filename - pass a puzzle by file
+Return: nothing specific, don't use the return value for this function
+|#
 (defun printSolutionBlock (outPut)
-    (format t "     Number of moves required: ~s~%" (list-length output))
+    (if (/= (list-length output) 0)
+        (format t "     Number of moves required: ~s~%" (list-length output)) ;if
+        (format t "     End not found.  ~%"))    ;else
     (format t "     Number of Nodes Generated: ~s~%" *nodesGenerated*)
     (format t "     Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
     (prt_sol outPut)

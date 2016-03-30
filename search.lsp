@@ -30,6 +30,9 @@ Added aStar method - this caused the overall function to require a
     heuristic value - the aStar value does sort the open list based
     on the heuristic value before it expends another node from the open
     list.
+Gave the function a way to handle itteratted deepining
+For itteratted deepining to work, the function lists open and closed
+    had to be modified in such a way that they check the node-depth
 
 |#
 

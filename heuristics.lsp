@@ -154,7 +154,7 @@ Return: This returns a sum value of all the Manhattan distances
 #|
 Name: tileDistance
 Author: Benjamin Kaiser
-Description: This function 
+Description: This function returns distance from where its suppose to be for 8-puzzle
 Parameters: loc is a list of length 2 which contians the x and y
 Return: 
 |#
@@ -180,6 +180,13 @@ Return:
 	)
 )
 
+#|
+Name: generalTileDistance
+Author: Benjamin Kaiser
+Description: This function returns distance from where its suppose to be for n-puzzle
+Parameters: loc is a list of length 2 which contians the x and y
+Return: 
+|#
 (defun generalTileDistance (loc puzzle size)
 	(let (valueToTest (returnVal 0))
 		(setf valueToTest (nth (cadr loc) (nth (car loc) puzzle)))

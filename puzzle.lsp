@@ -8,6 +8,7 @@
 
 (defvar *nodesGenerated*);includes generated duplicates that did not get added into the open list
 (defvar *nodesExpanded*)
+(defvar *finout*)
 
 
 #|
@@ -22,7 +23,9 @@ Return: nothing specific, don't use the return value for this function
     (
      &optional puzzleFile 
     )
-    (let ((puzzleList '((1 3 4)(8 6 2)(7 0 5))) sublistLength) ;set puzzel list to easy puzzle as default
+    (let ((puzzleList) sublistLength)
+
+	 (if (listp puzzleFile) (setf puzzleFile (car puzzleFile)))
          ;read in puzzleFile into puzzle list
          (if (not (null puzzleFile))
              (setf  puzzleList (fileio puzzlefile)); if
@@ -101,3 +104,5 @@ Return: nothing specific, don't use the return value for this function
     (format t "     Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
     (prt_sol outPut)
 )
+
+(8puzzle *ARGS*)

@@ -1,20 +1,19 @@
+(load 'read.lsp)
 (defun genGoal (size)
-	(let ((rowcount 0) (colCount 0) (counter 1) goalrow goalstate)
+	(let ((rowcount 0) (colCount 0) (counter 0) goalrow)
 		(cond
 			(
-				(= size 3) (setf goalstate '((7 6 5) (8 0 4) (1 2 3)))
+				(= size 3) (setf goalstate '(7 6 5 8 0 4 1 2 3))
 			)
 			(
 				t
-				(dotimes (n  (1- (* size size)))
+				(dotimes (n  (* size size))
 	   				(push counter goalrow)
 					(incf counter)
-					(incf colCount)
-					(when (= n (- (* size size) 2)) (push 0 goalrow) (incf colCount))
-					(when (= colCount size) (push (reverse goalrow) goalstate) (setf colCount 0) (setf goalrow nil))
+					;(break)
 				)
 			)
 		)
-		(reverse goalstate)
+		(getNested size (reverse goalrow))
 	)
 )

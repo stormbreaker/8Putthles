@@ -4,6 +4,7 @@
 (load 'read.lsp)
 (load 'heuristics.lsp)
 (load 'output.lsp)
+(load 'solvable.lsp)
 
 (defvar *nodesGenerated*);includes generated duplicates that did not get added into the open list
 (defvar *nodesExpanded*)
@@ -34,7 +35,11 @@ Return: nothing specific, don't use the return value for this function
              (return-from 8puzzle nil))
          
          ;check if solvable <- he does give us a solvable function
-         
+         (cond
+             ((solve_switch puzzleList subListLength))
+             (t (format t "Puzzle not solvable~%") (return-from 8puzzle nil)))
+
+         ;add 
          
          ;place into 2d style list (easier for the output guy)
          (setf puzzleList (getNested sublistLength puzzleList))

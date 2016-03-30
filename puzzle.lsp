@@ -43,28 +43,10 @@ Return: nothing specific, don't use the return value for this function
          
          
          
-         ;BreathFirstSearch
-         (format t "BFS search: (May take a while)~%")
-         (setf *nodesGenerated* 0);reset globals
-         (setf *nodesExpanded* 0)
-         (setf outPut (bfs puzzleList));return OutputList
-         (printSolutionBlock outPut)
-         
-         
-         
-         ;DepthFirstIteratedDepeningSearch
-         (setf *nodesGenerated* 0);reset globals
-         (setf *nodesExpanded* 0)
-         (format t "~%~%DFS itterated deepening search: (May take a while)~%")
-         (setf outPut (dfsID puzzleList));return OutputList
-         (printSolutionBlock outPut)
-         
-         
-         
          ;A* admissible #1
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
-         (format t "~%~%A* Misplaced Tiles search:~%")
+         (format t "A* Misplaced Tiles search:~%")
          (setf outPut(aStar puzzleList #'simpleHeuristic ));return OutputList
          (printSolutionBlock outPut)
          
@@ -80,6 +62,20 @@ Return: nothing specific, don't use the return value for this function
          (setf *nodesExpanded* 0)
          (format t "~%~%A* Nilsson's Sequence Score search:~%")
          (setf outPut (aStar puzzleList #'nilsson ));return OutputList
+         (printSolutionBlock outPut)
+         
+         ;DepthFirstIteratedDepeningSearch
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (format t "~%~%DFS itterated deepening search: (May take a while)~%")
+         ;(setf outPut (dfsID puzzleList));return OutputList
+         (printSolutionBlock outPut)
+         
+         ;BreathFirstSearch
+         (format t "~%~%BFS search: (May take a while)~%")
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (setf outPut (bfs puzzleList));return OutputList
          (printSolutionBlock outPut)
     )
 )

@@ -26,17 +26,28 @@ Return: nothing specific, don't use the return value for this function
     )
     (let ((puzzleList) sublistLength)
 
-	 (if (listp puzzleFile) (setf puzzleFile (car puzzleFile)))
+         ;grab value from *args*
+	     (  if (listp puzzleFile) (setf puzzleFile (car puzzleFile)))
+         
+         
          ;read in puzzleFile into puzzle list
-         (if (not (null puzzleFile))
-             (setf  puzzleList (fileio puzzlefile)); if
-             (setf puzzleList ( userinput ))    ;else
+         (cond 
+             ((not (null puzzleFile))
+                (cond ((not (setf  puzzleList (fileio puzzlefile))) ;if
+                       (format nil "Error: cannot open file ~a" puzzlefile)
+                       (return-from 8puzzle nil)) ); inner if
+             )
+             (t (setf puzzleList ( userinput )) )   ;else
          )
+         
          
          ;check if size is Valid
          (setf subListLength (sqrt (list-length puzzleList)));also sets the sublist length
-         (if (not (integerp subListLength))
+         (cond ((not (integerp subListLength))
+             (format t "Size invalid ~%")
              (return-from 8puzzle nil))
+         )
+         
          
          ;check if solvable <- he does give us a solvable function
          (cond

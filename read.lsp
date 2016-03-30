@@ -20,7 +20,7 @@ Return: This function returns the content of the file in a list.
 		(setf fin (open filename :if-does-not-exist nil)); open file, returning NIL on error
 	      
 		(when (null fin) 
-			(return-from fileio (format nil "Error: cannot open file ~a" filename))
+			(return-from fileio nil)
 		)
 	    (do ((data (read fin nil) (read fin nil))); read entire file, returning NIL at EOF
 			((null data) (close fin) (reverse datahold)) ;return a reversed list when EOF

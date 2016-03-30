@@ -24,6 +24,12 @@ had to fix the termination condition so that the do loop would even run
     (repeated error of GOAL-STATE not visilbe for RETURN-FROM)
 made local variable solution so that the solution was forced to be
     the last thing evaluated
+Added aStar method - this caused the overall function to require a 
+    heuristic function to generate values for each state. Any function
+    can be passed into bfs and dfs because they do not use the 
+    heuristic value - the aStar value does sort the open list based
+    on the heuristic value before it expends another node from the open
+    list.
 
 |#
 
@@ -45,6 +51,13 @@ made local variable solution so that the solution was forced to be
 ; Depth-first-search implements the OPEN list as a STACK of (state parent) nodes.
 (defun dfs (start) (search_bfs_dfs start 'dfs #'(lambda (state) 0)))
 
+; Depth-first-search implements the OPEN list as a STACK of (state parent) nodes.
+(defun dfsID (start) 
+    (let ((maxDepth 1))
+        (search_bfs_dfs start 'dfsID #'(lambda (state) maxDepth))
+    )
+)
+
 ; A* search, sorts the OPEN list based on heurist value
 (defun aStar (start heuristic) (search_bfs_dfs start 'aStar heuristic))
 
@@ -52,60 +65,105 @@ made local variable solution so that the solution was forced to be
 (defun search_bfs_dfs 
     (
      start type
-     heuristicVal   
+     heuristicVal 
     )
-    (let (solution)
-        (do*                                                    ; note use of sequential DO*
-            (                                                   ; initialize local loop vars
-                (curNode (make-node :state start :parent nil :heuristic (funcall heuristicVal start) :depth 0 ))  ; current node: (start nil)
-                (OPEN (list curNode))                           ; OPEN list:    ((start nil))
-                (CLOSED nil)                                    ; CLOSED list:  ( )
-            )
+    (let (solution maxDepth (CLOSED nil) (dfsIDHitEnd nil))
+         (if (eq type 'dfsID)(setf maxDepth (funcall heuristicVal 0))) ;uses the heuristic function to pass max depth - only used in dfsID
+         ( block sequential-DO* 
+            (do*                                                    ; note use of sequential DO*
+                (                                                   ; initialize local loop vars
+                    (curNode (make-node :state start :parent nil 
+                                        :heuristic (funcall heuristicVal start) 
+                                        :depth 0 ))  ; current node: (start nil)
+                    (OPEN (list curNode))                           ; OPEN list:    ((start nil)) 
+                )
 
-            ; termination condition - return solution path when goal is found
-            ((if (goal-state (node-state curNode)) (setf solution (build-solution curNode CLOSED))))
+                ; termination condition - return solution path when goal is found
+                ((if (goal-state (node-state curNode)) (setf solution (build-solution curNode CLOSED))))
+                
+                ; loop body
+                (when (null OPEN) (return nil))             ; no solution
 
-            ; loop body
-            (when (null OPEN) (return nil))             ; no solution
+                ;This is where the sort must happen for aStar
+                (if (eq type 'aStar) (sort OPEN #'< :key #'node-heuristic))
 
-            (if (eq type 'aStar) (format t "OPEN: before sort ~s~%" OPEN) )
-            ;This is where the sort must happen for aStar
-            (if (eq type 'aStar) (sort OPEN #'< :key #'node-heuristic))
-            
-            (if (eq type 'aStar) (format t "OPEN: before sort ~s~%" OPEN) )
-            
-            ; get current node from OPEN, update OPEN and CLOSED
-            (setf curNode (car OPEN))
-            (setf OPEN (cdr OPEN))
-            (setf CLOSED (cons curNode CLOSED))
+                ; get current node from OPEN, update OPEN and CLOSED
+                (setf curNode (car OPEN))
+                (setf OPEN (cdr OPEN))
+                (setf CLOSED (cons curNode CLOSED))
 
-            ; add successors of current node to OPEN
-            (dolist (child (generate-successors (node-state curNode)))
+                (incf *nodesExpanded* 1) ;Global count of nodes expanded
+                      ;this variable requires outside sources to reset
 
-                ; for each child node
-                (setf child (make-node :state child :parent (node-state curNode) :heuristic (+ (+ 1 ( node-depth curNode )) (funcall heuristicVal (node-state curNode))) :depth (+ 1 ( node-depth curNode ))))
+                ; add successors of current node to OPEN
+                (dolist (child (generate-successors (node-state curNode)))
 
-                ; if the node is not on OPEN or CLOSED
-                (if (and (not (member child OPEN   :test #'equal-states))
-                         (not (member child CLOSED :test #'equal-states)))
+                    ; for each child node
+                    (setf child (make-node :state child 
+                                           :parent (node-state curNode) 
+                                           :heuristic (+ (+ 1 ( node-depth curNode )) (funcall heuristicVal (node-state curNode))) 
+                                           :depth (+ 1 ( node-depth curNode ))))
 
-                    ; add it to the OPEN list
-                    (cond
+                    (incf *nodesGenerated* 1) ;Global count of nodes generated
+                      ;this variable requires outside sources to reset
 
-                        ; BFS - add to end of OPEN list (queue)
-                        ((eq type 'bfs) (setf OPEN (append OPEN (list child))))
+                    ; if the node is not on OPEN or CLOSED
+                    (if (or (
+                              and (not (member child OPEN   :test #'equal-states))
+                                  (not (member child CLOSED :test #'equal-states))
+                             )
+                             (
+                              or  (cond 
+                                      ((and (member child OPEN   :test #'equal-states) 
+                                           (< (node-depth child) 
+                                              (node-depth (nth (position child OPEN   :test #'equal-states) OPEN))))
+                                                (setf OPEN (remove (position child OPEN   :test #'equal-states) OPEN))
+                                                t
+                                      )
+                                      
+                                      ((and (member child CLOSED   :test #'equal-states) 
+                                           (< (node-depth child) 
+                                              (node-depth (nth (position child CLOSED   :test #'equal-states) CLOSED))))
+                                                (setf CLOSED (remove (position child CLOSED   :test #'equal-states) CLOSED))
+                                                t
+                                      )
+                                       
+                                       (t nil)
+                                      )
+                                  )
+                             )
 
-                        ; DFS - add to start of OPEN list (stack)
-                        ((eq type 'dfs) (setf OPEN (cons child OPEN)))
-                        
-                        ; A*  - add to end of open list and sort after
-                        ((eq type 'aStar) (setf OPEN (append OPEN (list child))))
+                        ; add it to the OPEN list
+                        (cond
 
-                        ; error handling for incorrect usage
-                        (t (format t "SEARCH: bad search type! ~s~%" type) (return nil))
+                            ; BFS - add to end of OPEN list (queue)
+                            ((eq type 'bfs) (setf OPEN (append OPEN (list child))))
+
+                            ; if at max depth add to close list
+                            ((and (eq type 'dfsID) (= (node-depth child) maxDepth)) 
+                             (setf CLOSED (cons child CLOSED))
+                             (setf dfsIDHitEnd T)
+                            )
+                            
+                            ; DFS - add to start of OPEN list (stack)
+                            ((or (eq type 'dfs) (eq type 'dfsID)) (setf OPEN (cons child OPEN)))
+
+                            ; A*  - add to end of open list and sort after
+                            ((eq type 'aStar) (setf OPEN (append OPEN (list child))))
+
+                            ; error handling for incorrect usage
+                            (t (format t "SEARCH: bad search type! ~s~%" type) (return nil))
+                        )
                     )
                 )
             )
+        )
+        (if (and (eq type 'dfsID) (not solution) dfsIDHitEnd)
+            (setf solution 
+                (search_bfs_dfs start 'dfsID 
+                               #'(lambda (state) (+ 1 maxDepth))
+                )
+            ) 
         )
         solution;makes sure the solution list is the last thing evaluated
     )
@@ -123,11 +181,9 @@ made local variable solution so that the solution was forced to be
 
         ; find the parent of the current node
         (setf node (member-state (node-parent node) node-list))
-        (format t "node after setf = ~s~%" node)
 
         ; add it to the path
         (setf path (cons (node-state node) path))
-        (format t "path after setf = ~s~%" path)
         path
     )
 )
@@ -137,21 +193,4 @@ made local variable solution so that the solution was forced to be
     (dolist (node node-list)
         (when (equal state (node-state node)) (return node))
     )
-)
-
-;------------------------------------------------------------------------------
-;needed functions and added functions
-;------------------------------------------------------------------------------
-;returns true if goal state <- version only works on basic puzzle
-;returns true if goal state <- version only works on basic puzzle
-(defun goal-state (state)
-    (if (null (equal (car state) '(1 2 3))) (return-from goal-state nil))
-    (if (null (equal (cadr state) '(8 0 4))) (return-from goal-state nil))
-    (if (null (equal (caddr state) '(7 6 5))) (return-from goal-state nil))
-    t
-)
-
-;returns 0
-(defun zero ()
-    0
 )

@@ -1,306 +1,103 @@
 ;Load in Dr. Weiss's search code
 (load 'search.lsp)
-(declaim (ftype (function () t) customSearch))
-(declaim (ftype (function () t) swapPoints))
+(load 'search_functions.lsp)
+(load 'read.lsp)
+(load 'heuristics.lsp)
+(load 'output.lsp)
+(load 'solvable.lsp)
 
+(defvar *nodesGenerated*);includes generated duplicates that did not get added into the open list
+(defvar *nodesExpanded*)
+
+
+#|
+Name: 8puzzle
+Author: Johnathan Ackerman (but really everyone because i'm using their functions)
+Description:  This function displays a path and data about 5 different search routines run on
+the toy 8 puzzle.
+Parameters: optional filename - pass a puzzle by file
+Return: nothing specific, don't use the return value for this function
+|#
 (defun 8puzzle  
     (
-     puzzleFile  
-     &optional puzzleSize
+     &optional puzzleFile 
     )
-    (let ((defvar 'puzzleList '((1 3 4)(8 6 2)(7 0 5)))) ;set puzzel list to easy puzzle as default
-         ;check if size is Valid
+    (let ((puzzleList '((1 3 4)(8 6 2)(7 0 5))) sublistLength) ;set puzzel list to easy puzzle as default
          ;read in puzzleFile into puzzle list
+         (if (not (null puzzleFile))
+             (setf  puzzleList (fileio puzzlefile)); if
+             (setf puzzleList ( userinput ))    ;else
+         )
+         
+         ;check if size is Valid
+         (setf subListLength (sqrt (list-length puzzleList)));also sets the sublist length
+         (if (not (integerp subListLength))
+             (return-from 8puzzle nil))
+         
          ;check if solvable <- he does give us a solvable function
+         (cond
+             ((solve_switch puzzleList subListLength))
+             (t (format t "Puzzle not solvable~%") (return-from 8puzzle nil)))
+
+         ;add 
          
-         ;BreathFirstSearch
-         (customSearch    puzzleList  BFS Null );return OutputList
-         (PrintScreen OutputList)
+         ;place into 2d style list (easier for the output guy)
+         (setf puzzleList (getNested sublistLength puzzleList))
          
-         ;DepthFirstIteratedDepeningSearch
-         (customSearch    puzzleList  DFID    Null );return OutputList
-         (printScreen OutputList)
+         ;any further checks on the list should go here
+         
+         
          
          ;A* admissible #1
-         (customSearch    puzzleList  bestFirst   admissibleHeuristic1 );return OutputList
-         (printScreen OutputList)
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (format t "A* Misplaced Tiles search:~%")
+         (setf outPut(aStar puzzleList #'simpleHeuristic ));return OutputList
+         (printSolutionBlock outPut)
          
          ;A* admissible #2
-         (customSearch    puzzleList  bestFirst   admissibleHeuristic2 );return OutputList
-         (printScreen OutputList)
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (format t "~%~%A* Manhattan Distance search:~%")
+         (setf outPut(aStar puzzleList #'calcManhattan ));return OutputList
+         (printSolutionBlock outPut)
          
          ;A* inadmissible
-         (customSearch    puzzleList  bestFirst   inAdmissibleHeuristic1 );return OutputList
-         (printScreen OutputList)
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (format t "~%~%A* Nilsson's Sequence Score search:~%")
+         (setf outPut (aStar puzzleList #'nilsson ));return OutputList
+         (printSolutionBlock outPut)
+         
+         ;DepthFirstIteratedDepeningSearch
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (format t "~%~%DFS itterated deepening search: (May take a while)~%")
+         (setf outPut (dfsID puzzleList));return OutputList
+         (printSolutionBlock outPut)
+         
+         ;BreathFirstSearch
+         (format t "~%~%BFS search: (May take a while)~%")
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (setf outPut (bfs puzzleList));return OutputList
+         (printSolutionBlock outPut)
     )
 )
 
-(defun customSearch   
-    (
-     'puzzleList  
-     algorithm   
-     Heuristic
-    )
-    (let    ((defvar 'answerList))
-            ;(if Heuristic /= null)
-                (algorithm  'puzzleList  Heuristic);return answerList
-            ;else
-                (algorithm  'puzzleList);return answerList
-            
-            (prepForDisplay 'answerList);return this ; this could all be done in printScreen
-            
-    )
-)
-
-(defun bestFirst    'puzzleList  heuristic
-    (let    ((defvar 'answerList))
-
-            ; sudo code for a* from Weiss's website
 #|
-            BestFS( node ) // A* algorithm
-            {
-            Add( node, open );
-            repeat
-            node = Best( open );
-            move node from open list to closed list;
-            if Goal( node ) then return SUCCESS;
-            for each child in Successors( node ) do
-            if child is not on open or closed lists then
-            Add( child, open );
-            else if child is on open list then
-            update F’( node ) and Parent( node );
-            else if child is on closed list then
-            update F’( node ) and Parent( node ) and either
-            a) move node from closed to open;
-            - OR -
-            b) update descendants of node on open and closed;
-            until Empty( open );
-            return FAILURE;
-            }
+Name: printSolutionBlock
+Author: Johnathan Ackerman (but really everyone because i'm using their functions)
+Description:  This function displays a path and data about 5 different search routines run on
+the toy 8 puzzle.
+Parameters: optional filename - pass a puzzle by file
+Return: nothing specific, don't use the return value for this function
 |#
-    )
-)
-
-(defun printScreen  'outputList
-    (let    ()
-            ;actually print to screen
-    )
-)
-
-;Functions needed for weiss's search algorithms
-#|----------------------------------------------------|#
-
-;generates successors from the current state - should work for all versions
-(defun generate-successors (state)
-    (let    (
-             ( sublistCounter 0 )
-             successor-list ;will become a list of node sturcture
-             elementCounter
-             ( curPosition '(0 0)) successorNode
-             size (right 1)
-             (left -1) ( up 1)
-             (down -1)
-             (newState)
-            )
-            
-            (format t "Top of generate-successors~%")
-            
-            (format t "state = ~S~%" state)
-            
-            ;needs a list <- run until all successors generated
-            ;assume no successors have been made
-            ;state is the parrent state
-            ;find 0 in state
-            (block search-for-0 ;pointer to break from loop
-                (dolist (sublist state) ;2d list
-                    (setf elementCounter 0) ;reset x value
-                    (dolist (element sublist)
-                        (if (= element 0) (return-from search-for-0)
-                        (incf elementCounter)) ; increment x-value
-                    )
-                    (incf sublistCounter) ;increment y-value
-                )
-            )
-            (format t "setting curPosition~%")
-            ;sets curPosition of 0
-            (setf (car curPosition) elementCounter)
-            (setf (cadr curPosition) sublistCounter)
-            (format t "curPosition = ~S~%" curPosition)
-            (setf size (list-length state));gets the length of state-> 2d list, must be same width and height
-            
-            ;if the car of curPosition is 0, only horizantal movement is to the right
-            (cond 
-                ((= (car curPosition) 0) (setf newState (swapPoints state curPosition right 0))                
-                    ;put in list 
-                    (setf successor-list (append successor-list (list newState)))
-                )
-            
-                ;if the car of curPosition is size -1, only horizantal movement is to the left
-                ((= (car curPosition) (- size 1)) (setf newState (swapPoints state curPosition left 0))
-                    ;put in list
-                    (setf successor-list (append successor-list (list newState)))
-                                                
-                )
-            
-                ;else can move both
-                (t 
-                    (setf newState (swapPoints state curPosition left 0))
-                    ;put in list
-                    (setf successor-list (append successor-list (list newState)))
-                    
-                    (setf newState (swapPoints state curPosition right 0))
-                    ;put in list
-                    (setf successor-list (append successor-list (list newState)))
-                )
-            )
-            
-            ;if the cadr of curPosition is 0, only vertical movement is down
-            (cond
-                ((= (cadr curPosition) 0) (setf newState (swapPoints state curPosition 0 down))
-                    ;put in list
-                    (setf successor-list (append successor-list (list newState)))
-                )
-                ;if the cadr of curPosition is size -1, only vertical movement is up
-                ((= (cadr curPosition) (- size 1)) (setf newState (swapPoints state curPosition 0 up))
-                    ;put in list
-                    (setf successor-list (append successor-list (list newState)))
-                )
-                ;else can move both
-                (t 
-                    (setf newState (swapPoints state curPosition 0 down))
-                    ;put in list
-                    (setf successor-list (append successor-list (list newState)))
-            
-                    (setf newState (swapPoints state curPosition 0 up))
-                    ;put in list
-                    (setf successor-list (append successor-list (list newState)))
-                )
-            )
-            (format t "successor-list = ~S~%" successor-list)
-            successor-list
-    )
-)
-    
-(defun swapPoints (state curPosition right-left up-down)
-    (let ((tempState ()))
-         (dolist (subList state)
-             (setf tempState (append tempState (list (copy-list subList))))
-         )
-         (cond
-             ((= right-left 1) ;swap right
-                (rotatef ( nth (car curPosition) ( nth (cadr curPosition) tempState)) ( nth (+ 1 (car curPosition) ) ( nth (cadr curPosition) tempState)) )
-             )
-             ((= right-left -1) ;swap left
-                (rotatef ( nth (car curPosition) ( nth (cadr curPosition) tempState)) ( nth (- (car curPosition) 1 ) ( nth (cadr curPosition) tempState)) )
-              )
-             ((= up-down 1) ;swap up
-                (rotatef ( nth (car curPosition) ( nth (cadr curPosition) tempState)) ( nth (car curPosition) (nth (- (cadr curPosition) 1) tempState)) )
-              )
-             ((= up-down -1) ;swap down
-                (rotatef ( nth (car curPosition) ( nth (cadr curPosition) tempState)) ( nth (car curPosition) (nth (+ (cadr curPosition) 1) tempState)) )
-             )
-        )
-        tempstate
-    )
-)
-
-;Heuristics and helper function
-
-(defun simpleHeuristic (state)
-    (let (
-            (count 0)
-            (elementCounter 0) (sublistCounter 0)
-            goalState
-        )
-
-        ;set goalState
-        (setf goalState (generateGoalState (list-length state)))
-
-        (dolist (sublist state) ;2d list
-            (setf elementCounter 0) ;reset x value
-            (dolist (element sublist)
-                (if (/= element ( nth elementCOunter ( nth sublistCounter goalState))) (incf count))
-                (incf elementCounter) ; increment x-value
-            )
-            (incf sublistCounter) ;increment y-value
-        )
-        count
-    )
-)
-
-(defun generateGoalState ( length )
-
-    ;use length to generalize
-    
-    ;currently just 8Puzzle though
-    '((1 2 3)(8 0 4)(7 6 5)) ;return solution
-
-)
-
-(defun nilsson (state)
-    (let (
-            (count 0)
-            (elementCounter 0) (sublistCounter 0)
-            (curPosition '(0 0))
-            goalState
-        )
-
-        ;set goalState
-        (setf goalState (generateGoalState (list-length state)))
-        
-        ;find 0 in goalState
-        (block search-for-0 ;pointer to break from loop
-            (dolist (sublist goalState) ;2d list
-                (setf elementCounter 0) ;reset x value
-                (dolist (element sublist)
-                    (if (= element 0) (return-from search-for-0)
-                    (incf elementCounter)) ; increment x-value
-                )
-                (incf sublistCounter) ;increment y-value
-            )
-        )
-
-        (setf sublistCounter 0)
-        (dolist (sublist state) ;2d list
-            (setf elementCounter 0) ;reset x value
-            (dolist (element sublist)
-                ;check top
-                (if (and (/= sublistCounter 0) 
-                    (/= ( nth elementCounter ( nth (- sublistCounter 1) state)) 
-                        ( nth elementCounter ( nth (- sublistCounter 1) goalState))))
-                    (incf count 2); increment count
-                )
-                
-                ;check bottom
-                (if (and (/= sublistCounter (- (list-length state) 1 ))
-                    (/= ( nth elementCounter ( nth (+ sublistCounter 1) state)) 
-                        ( nth elementCounter ( nth (+ sublistCounter 1) goalState))))
-                    (incf count 2); increment count
-                )
-                
-                ;check left
-                (if (and (/= elementCounter 0)
-                    (/= ( nth (- elementCounter 1) ( nth sublistCounter state)) 
-                        ( nth (- elementCounter 1) ( nth sublistCounter goalState))))
-                    (incf count 2)
-                )
-                
-                ;check right
-                (if (and (/= elementCounter (- ( list-length state) 1 ))
-                    (/= ( nth (+ elementCounter 1) ( nth sublistCounter state)) 
-                        ( nth (+ elementCounter 1) ( nth sublistCounter goalState))))
-                    (incf count 2)
-                )
-                
-                (incf elementCounter) ;increment x-value
-            )
-            (incf sublistCounter) ;increment y-value
-        )
-        
-        ;check 0
-        (if (= ( nth (car curPosition) ( nth (cadr curPosition) state)) ( nth (car curPosition) ( nth (cadr curPosition) goalState)))
-            (incf count 1)) ; increment x-value
-
-        count
-    )
+(defun printSolutionBlock (outPut)
+    (if (/= (list-length output) 0)
+        (format t "     Number of moves required: ~s~%" (list-length output)) ;if
+        (format t "     End not found.  ~%"))    ;else
+    (format t "     Number of Nodes Generated: ~s~%" *nodesGenerated*)
+    (format t "     Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+    (prt_sol outPut)
 )

@@ -70,19 +70,21 @@ Date March 2016
     (cond
         ((eq prt_row 0) nil)
         (t (cond
-            ((null (cdr row)) (prt_elem (car row) nil))
-            (t (prt_elem (car row) nil) (prt_row (cdr row) t))
+            ((null (cdr row)) (prt_elem (car row) nil (list-length row)))
+            (t (prt_elem (car row) nil (list-length row)) (prt_row (cdr row) t))
            )
         )
     )
 )
 
 ; prints a single element of the puzzle
-(defun prt_elem (elem end_row)
-    "(prt_elem elem) prints an element of a puzzle's row, unless blank"
+(defun prt_elem (elem end_row size)
+    "(prt_elem elem end_row size) prints an element of a puzzles row, unless blank"
     (cond
-        ((equal '0 elem) (format t " "))
-        (t (format t "~D" elem))
+        ((equal '0 elem)
+         (if (> 3 size) (format t "   ")
+             (format t "  ")))
+        (t (format t "~2D" elem))
     )
 
     (cond

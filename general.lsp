@@ -3,7 +3,7 @@
 	(let ((rowcount 0) (colCount 0) (counter 0) goalrow)
 		(cond
 			(
-				(= size 3) (setf goalstate '(7 6 5 8 0 4 1 2 3))
+				(= size 3) (return-from genGoal (setf goalrow (getNested size '(1 2 3 8 0 4 7 6 5))))
 			)
 			(
 				t
@@ -14,6 +14,6 @@
 				)
 			)
 		)
-		(getNested size (reverse goalrow))
+                (getNested size (reverse goalrow))
 	)
 )

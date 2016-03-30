@@ -83,7 +83,7 @@ Return:  The single value is input and must be set to another variable.
 		(read)
 	)
 )
-
+  
 #|
 ;For testing purposes to test these function independently
 (setf puzsize (entersize))

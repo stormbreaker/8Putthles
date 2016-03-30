@@ -48,57 +48,56 @@ Return: nothing specific, don't use the return value for this function
          
          
          
-         ;BreathFirstSearch
-         (format t "BFS search: (may take a while)~%")
-         (setf *nodesGenerated* 0);reset globals
-         (setf *nodesExpanded* 0)
-         (setf outPut (bfs puzzleList));return OutputList
-         (prt_sol outPut)
-         (format t "Number of moves required: ~s~%" (list-length output))
-         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
-         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
-         
-         
-         
-         ;DepthFirstIteratedDepeningSearch
-         (setf *nodesGenerated* 0);reset globals
-         (setf *nodesExpanded* 0)
-         (format t "~%~%DFS itterated deepening search:~%")
-         ;(setf outPut (dfs puzzleList));return OutputList
-         (format t "Number of moves required: ~s~%" (list-length output))
-         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
-         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
-         
-         
-         
          ;A* admissible #1
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
+         (format t "A* Misplaced Tiles search:~%")
          (setf outPut(aStar puzzleList #'simpleHeuristic ));return OutputList
-         (format t "~%~%A* Misplaced Tiles search:~%")
-         (prt_sol outPut)
-         (format t "Number of moves required: ~s~%" (list-length output))
-         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
-         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+         (printSolutionBlock outPut)
          
          ;A* admissible #2
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
-         (setf outPut(aStar puzzleList #'calcManhattan ));return OutputList
          (format t "~%~%A* Manhattan Distance search:~%")
-         (prt_sol outPut)
-         (format t "Number of moves required: ~s~%" (list-length output))
-         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
-         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+         (setf outPut(aStar puzzleList #'calcManhattan ));return OutputList
+         (printSolutionBlock outPut)
          
          ;A* inadmissible
          (setf *nodesGenerated* 0);reset globals
          (setf *nodesExpanded* 0)
-         (setf outPut (aStar puzzleList #'nilsson ));return OutputList
          (format t "~%~%A* Nilsson's Sequence Score search:~%")
-         (prt_sol outPut)
-         (format t "Number of moves required: ~s~%" (list-length output))
-         (format t "Number of Nodes Generated: ~s~%" *nodesGenerated*)
-         (format t "Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+         (setf outPut (aStar puzzleList #'nilsson ));return OutputList
+         (printSolutionBlock outPut)
+         
+         ;DepthFirstIteratedDepeningSearch
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (format t "~%~%DFS itterated deepening search: (May take a while)~%")
+         (setf outPut (dfsID puzzleList));return OutputList
+         (printSolutionBlock outPut)
+         
+         ;BreathFirstSearch
+         (format t "~%~%BFS search: (May take a while)~%")
+         (setf *nodesGenerated* 0);reset globals
+         (setf *nodesExpanded* 0)
+         (setf outPut (bfs puzzleList));return OutputList
+         (printSolutionBlock outPut)
     )
+)
+
+#|
+Name: printSolutionBlock
+Author: Johnathan Ackerman (but really everyone because i'm using their functions)
+Description:  This function displays a path and data about 5 different search routines run on
+the toy 8 puzzle.
+Parameters: optional filename - pass a puzzle by file
+Return: nothing specific, don't use the return value for this function
+|#
+(defun printSolutionBlock (outPut)
+    (if (/= (list-length output) 0)
+        (format t "     Number of moves required: ~s~%" (list-length output)) ;if
+        (format t "     End not found.  ~%"))    ;else
+    (format t "     Number of Nodes Generated: ~s~%" *nodesGenerated*)
+    (format t "     Number of Nodes Expaneded: ~s~%" *nodesExpanded*)
+    (prt_sol outPut)
 )

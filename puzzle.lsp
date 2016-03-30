@@ -5,6 +5,7 @@
 (load 'heuristics.lsp)
 (load 'output.lsp)
 (load 'solvable.lsp)
+(load 'general.lsp)
 
 (defvar *nodesGenerated*);includes generated duplicates that did not get added into the open list
 (defvar *nodesExpanded*)

@@ -19,7 +19,7 @@ Return: count - Heuristic generated value
         )
 
         ;set goalState
-        (setf goalState (generateGoalState (list-length state)))
+        (setf goalState (genGoal (list-length state)))
 
         (dolist (sublist state) ;2d list
             (setf elementCounter 0) ;reset x value
@@ -57,7 +57,7 @@ Return: count - Heuristic generated value
         )
 
         ;set goalState
-        (setf goalState (generateGoalState (list-length state)))
+        (setf goalState (genGoal (list-length state)))
         
         ;find 0 in goalState
         (block search-for-0 ;pointer to break from loop

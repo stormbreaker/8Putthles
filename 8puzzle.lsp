@@ -9,13 +9,13 @@ Description: This program Solves 8-puzzles and has been generallized
 
 Usage: just run using clisp
 running examples:
-    clisp 8Puzzle <filename>
+    clisp 8Puzzle.lsp <filename>
 or from within the interpreter
-    (load 8puzzle.lsp) <- this will prompt you for a series of numbers
+    (load '8puzzle) <- this will prompt you for a series of numbers
 once it is loaded
     (8puzzle '<filename>)
 
-The <> signifies optional
+NOTE: The <> signifies optional
 
 
 PLEASE NOTE

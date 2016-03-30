@@ -1,3 +1,25 @@
+#|
+Name: 8Puzzle
+Class: csc 447-Intro to AI
+Team: Johnny Ackerman, Samuel Carroll, Ben Kaiser
+Description: This program Solves 8-puzzles and has been generallized
+    to solve N-Puzzles. The code uses a variety of different searches
+    of which include: BFS, DFS with itteratted deeping, and A* with
+    multiple different heuristics.
+
+Usage: just run using clisp
+running examples:
+    clisp 8Puzzle <filename>
+or from within the interpreter
+    (load 8puzzle.lsp) <- this will prompt you for a series of numbers
+once it is loaded
+    (8puzzle '<filename>)
+
+The <> signifies optional
+|#
+
+
+
 ;Load in Dr. Weiss's search code
 (load 'search.lsp)
 (load 'search_functions.lsp)

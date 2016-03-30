@@ -136,8 +136,9 @@ Return:
 				;find out which row we're in and put in loc
 				(push rowI loc)
 				;call the helper function on this location
-				(setf sum (+ sum (tileDistance loc puzzle))) ;This line may be a little off
+				(setf sum (+ sum (generalTileDistance loc puzzle (length puzzle)))) ;This line may be a little off
 				;move to the next column
+				;(break)
 				(incf colI)
 			)
 			(setf colI 0)
@@ -176,6 +177,22 @@ Return:
 			((= valueToTest 8) (+ (abs (- (cadr loc) 0)) (abs (- (car loc) 1))))
 			(t 0)
 		)
+	)
+)
+
+(defun generalTileDistance (loc puzzle size)
+	(let (valueToTest (returnVal 0))
+		(setf valueToTest (nth (cadr loc) (nth (car loc) puzzle)))
+		;(break)
+		(cond
+			((= size 3) (tileDistance loc puzzle))
+			(
+				(not (= valueToTest 0))
+				(setf returnVal (+ (abs (- (cadr loc) (rem valueToTest size))) (abs (- (car loc) (/ (- valueToTest (rem valueToTest size)) size)))))
+			)
+			(t 0)
+		)
+		returnVal
 	)
 )
 
